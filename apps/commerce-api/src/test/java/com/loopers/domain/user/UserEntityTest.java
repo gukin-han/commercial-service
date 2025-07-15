@@ -36,7 +36,7 @@ class UserEntityTest {
             //when
             CoreException result = assertThrows(CoreException.class, () ->
                     UserEntity.builder()
-                            .userId(userId)
+                            .loginId(userId)
                             .email(email)
                             .dateOfBirth(dateOfBirth)
                             .build());
@@ -62,7 +62,7 @@ class UserEntityTest {
             //when
             CoreException result = assertThrows(CoreException.class, () ->
                     UserEntity.builder()
-                            .userId(userId)
+                            .loginId(userId)
                             .email(email)
                             .dateOfBirth(dateOfBirth)
                             .build());
@@ -88,7 +88,7 @@ class UserEntityTest {
             //when
             CoreException result = assertThrows(CoreException.class, () ->
                     UserEntity.builder()
-                            .userId(userId)
+                            .loginId(userId)
                             .email(email)
                             .dateOfBirth(dateOfBirth)
                             .build());

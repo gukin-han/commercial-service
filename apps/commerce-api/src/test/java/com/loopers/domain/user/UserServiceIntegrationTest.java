@@ -1,5 +1,6 @@
 package com.loopers.domain.user;
 
+import com.loopers.support.constant.Gender;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -43,20 +44,22 @@ class UserServiceIntegrationTest {
         void savesUserEntity_whenSignUpSuccessfully(){
             //given
             UserEntity userEntity = UserEntity.builder()
-                    .userId("gukin")
+                    .loginId("gukin")
                     .email("gukin@gmail.com")
                     .dateOfBirth("2025-07-15")
+                    .gender(Gender.FEMALE)
                     .build();
 
             //when
             userService.signUp(userEntity);
 
             //then
-            UserEntity savedUser = userRepository.findByUserId("gukin").get();
+            UserEntity savedUser = userRepository.findByLoginId("gukin").get();
             assertAll(
-                    () -> assertThat(savedUser.getUserId()).isEqualTo(userEntity.getUserId()),
+                    () -> assertThat(savedUser.getLoginId()).isEqualTo(userEntity.getLoginId()),
                     () -> assertThat(savedUser.getEmail()).isEqualTo(userEntity.getEmail()),
-                    () -> assertThat(savedUser.getDateOfBirth()).isEqualTo(userEntity.getDateOfBirth()));
+                    () -> assertThat(savedUser.getDateOfBirth()).isEqualTo(userEntity.getDateOfBirth()),
+                    () -> assertThat(savedUser.getGender()).isEqualTo(userEntity.getGender()));
         }
 
         @DisplayName("이미 가입된 ID로 회원가입 시도 시, 실패한다")
@@ -64,9 +67,10 @@ class UserServiceIntegrationTest {
         void throwsBadRequestException_whenSignUpWithExistingUserId(){
             //given
             UserEntity userEntity = UserEntity.builder()
-                    .userId("gukin")
+                    .loginId("gukin")
                     .email("gukin@gmail.com")
                     .dateOfBirth("2025-07-15")
+                    .gender(Gender.FEMALE)
                     .build();
             userService.signUp(userEntity);
 

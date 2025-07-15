@@ -8,5 +8,6 @@ public interface UserV1ApiSpec {
             UserV1Dto.RegisterRequest request
     );
 
+    ApiResponse<UserV1Dto.UserResponse> getMe(String UserId);
 
 }

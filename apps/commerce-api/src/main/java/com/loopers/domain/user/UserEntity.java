@@ -16,15 +16,15 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 public class UserEntity extends BaseEntity {
 
-    private String userId;
+    private String loginId;
     private String email;
     private String dateOfBirth;
     private Gender gender;
 
     @Builder
-    public UserEntity(String userId, String email, String dateOfBirth, Gender gender) {
-        if (userId == null || !userId.matches("^[a-zA-Z0-9]{1,10}$")) {
-            throw new CoreException(ErrorType.BAD_REQUEST, "유저 아이디는 영문 및 숫자 10자 이내로 입력해야 합니다.");
+    public UserEntity(String loginId, String email, String dateOfBirth, Gender gender) {
+        if (loginId == null || !loginId.matches("^[a-zA-Z0-9]{1,10}$")) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "아이디는 영문 및 숫자 10자 이내로 입력해야 합니다.");
         }
 
         if (email == null || !email.matches("^[\\w.%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
@@ -39,7 +39,7 @@ public class UserEntity extends BaseEntity {
             throw new CoreException(ErrorType.BAD_REQUEST, "성별은 필수 입력 항목입니다.");
         }
 
-        this.userId = userId;
+        this.loginId = loginId;
         this.email = email;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;

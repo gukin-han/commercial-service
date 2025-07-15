@@ -13,7 +13,7 @@ public class UserService {
 
     public UserEntity signUp(UserEntity user) {
         // 유저 정보 검증
-        userRepository.findByUserId(user.getUserId())
+        userRepository.findByLoginId(user.getLoginId())
                 .ifPresent(existingUser -> {
                     throw new CoreException(ErrorType.BAD_REQUEST, "이미 가입된 ID 입니다.");
                 });
