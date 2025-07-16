@@ -21,4 +21,9 @@ public class UserService {
         // 유저 저장
         return userRepository.save(user);
     }
+
+  public UserEntity getMe(String LoginId) {
+        return userRepository.findByLoginId(LoginId).orElse(null);
+
+  }
 }
