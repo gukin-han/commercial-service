@@ -81,4 +81,48 @@ class UserServiceIntegrationTest {
             assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
         }
     }
+
+    /**
+     * - [ ]  해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다.
+     * - [ ]  해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.
+     */
+    @DisplayName("내 정보 조회 시")
+    @Nested
+    class getMe {
+        @DisplayName("해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다")
+        @Test
+        void returnsUserEntity_whenUserExists() {
+            //given
+            UserEntity userEntity = UserEntity.builder()
+                .loginId("gukin")
+                .email("gukin@gmail.com")
+                .dateOfBirth("2025-07-15")
+                .gender(Gender.FEMALE)
+                .build();
+            userService.signUp(userEntity);
+
+            //when
+            UserEntity result = userService.getMe(userEntity.getLoginId());
+
+            //then
+            assertAll(
+                () -> assertThat(result.getLoginId()).isEqualTo(userEntity.getLoginId()),
+                () -> assertThat(result.getEmail()).isEqualTo(userEntity.getEmail()),
+                () -> assertThat(result.getDateOfBirth()).isEqualTo(userEntity.getDateOfBirth()),
+                () -> assertThat(result.getGender()).isEqualTo(userEntity.getGender()));
+        }
+
+        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다")
+        @Test
+        void returnsNull_whenUserDoesNotExist() {
+            //given
+            String nonExistentLoginId = "nonExistentUser";
+
+            //when
+            UserEntity result = userService.getMe(nonExistentLoginId);
+
+            //then
+            assertThat(result).isNull();
+        }
+    }
 }
