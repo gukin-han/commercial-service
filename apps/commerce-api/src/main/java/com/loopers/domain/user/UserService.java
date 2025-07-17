@@ -22,8 +22,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-  public User getMe(String userId) {
+    public User getMe(String userId) {
         return userRepository.findByUserId(userId).orElse(null);
 
-  }
+    }
 }

@@ -37,11 +37,11 @@ class UserServiceIntegrationTest {
      */
     @DisplayName("회원 가입 시")
     @Nested
-    class signUp{
+    class signUp {
 
         @DisplayName("User 저장이 수행된다")
         @Test
-        void savesUserEntity_whenSignUpSuccessfully(){
+        void savesUserEntity_whenSignUpSuccessfully() {
             //given
             User user = User.builder()
                     .userId("gukin")
@@ -64,7 +64,7 @@ class UserServiceIntegrationTest {
 
         @DisplayName("이미 가입된 ID로 회원가입 시도 시, 실패한다")
         @Test
-        void throwsBadRequestException_whenSignUpWithExistingUserId(){
+        void throwsBadRequestException_whenSignUpWithExistingUserId() {
             //given
             User user = User.builder()
                     .userId("gukin")
@@ -94,11 +94,11 @@ class UserServiceIntegrationTest {
         void returnsUserEntity_whenUserExists() {
             //given
             User user = User.builder()
-                .userId("gukin")
-                .email("gukin@gmail.com")
-                .dateOfBirth("2025-07-15")
-                .gender(Gender.FEMALE)
-                .build();
+                    .userId("gukin")
+                    .email("gukin@gmail.com")
+                    .dateOfBirth("2025-07-15")
+                    .gender(Gender.FEMALE)
+                    .build();
             userService.signUp(user);
 
             //when
@@ -106,10 +106,10 @@ class UserServiceIntegrationTest {
 
             //then
             assertAll(
-                () -> assertThat(result.getUserId()).isEqualTo(user.getUserId()),
-                () -> assertThat(result.getEmail()).isEqualTo(user.getEmail()),
-                () -> assertThat(result.getDateOfBirth()).isEqualTo(user.getDateOfBirth()),
-                () -> assertThat(result.getGender()).isEqualTo(user.getGender()));
+                    () -> assertThat(result.getUserId()).isEqualTo(user.getUserId()),
+                    () -> assertThat(result.getEmail()).isEqualTo(user.getEmail()),
+                    () -> assertThat(result.getDateOfBirth()).isEqualTo(user.getDateOfBirth()),
+                    () -> assertThat(result.getGender()).isEqualTo(user.getGender()));
         }
 
         @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다")

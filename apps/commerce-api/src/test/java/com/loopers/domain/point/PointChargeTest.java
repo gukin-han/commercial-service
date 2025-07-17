@@ -13,29 +13,29 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class PointChargeTest {
 
-  /**
-   * - [ ] 0 이하의 정수로 포인트를 충전 시 실패한다.
-   */
-  @DisplayName("포인트 충전 생성할때")
-  @Nested
-  class Create {
+    /**
+     * - [ ] 0 이하의 정수로 포인트를 충전 시 실패한다.
+     */
+    @DisplayName("포인트 충전 생성할때")
+    @Nested
+    class Create {
 
-    @DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다.")
-    @ParameterizedTest
-    @ValueSource(ints = {-1, 0})
-    void fails_whenAmountIsZeroOrLess(long amount) {
-      //given
-      String userId = "gukin";
+        @DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다.")
+        @ParameterizedTest
+        @ValueSource(ints = {-1, 0})
+        void fails_whenAmountIsZeroOrLess(long amount) {
+            //given
+            String userId = "gukin";
 
-      //when
-      CoreException result = assertThrows(CoreException.class, () -> new PointCharge(amount));
+            //when
+            CoreException result = assertThrows(CoreException.class, () -> new PointCharge(amount));
 
-      //then
-      Assertions.assertAll(
-          () -> assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST),
-          () -> assertThat(result.getMessage()).isEqualTo("충전 금액은 0보다 커야 합니다.")
-      );
+            //then
+            Assertions.assertAll(
+                    () -> assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST),
+                    () -> assertThat(result.getMessage()).isEqualTo("충전 금액은 0보다 커야 합니다.")
+            );
+        }
     }
-  }
 
 }

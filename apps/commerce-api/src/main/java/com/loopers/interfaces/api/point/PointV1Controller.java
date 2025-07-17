@@ -20,30 +20,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PointV1Controller implements PointV1ApiSpec {
 
-  private final PointFacade pointFacade;
+    private final PointFacade pointFacade;
 
-  @Override
-  @GetMapping
-  public ApiResponse<PointResponse> get(@RequestHeader("X-USER-ID") String userId) {
+    @Override
+    @GetMapping
+    public ApiResponse<PointResponse> get(@RequestHeader("X-USER-ID") String userId) {
 
-    if (userId == null || userId.isBlank()) {
-      throw new CoreException(ErrorType.BAD_REQUEST);
+        if (userId == null || userId.isBlank()) {
+            throw new CoreException(ErrorType.BAD_REQUEST);
+        }
+        Point point = pointFacade.getPointByUserId(userId);
+        PointV1Dto.PointResponse response = PointResponse.fromEntity(point);
+        return ApiResponse.success(response);
     }
-    Point point = pointFacade.getPointByUserId(userId);
-    PointV1Dto.PointResponse response = PointResponse.fromEntity(point);
-    return ApiResponse.success(response);
-  }
 
-  @Override
-  @PostMapping("/charge")
-  public ApiResponse<PointV1Dto.PointResponse> charge(
-      @RequestHeader("X-USER-ID") String userId, @RequestBody PointV1Dto.ChargeRequest request) {
+    @Override
+    @PostMapping("/charge")
+    public ApiResponse<PointV1Dto.PointResponse> charge(
+            @RequestHeader("X-USER-ID") String userId, @RequestBody PointV1Dto.ChargeRequest request) {
 
-    PointCharge pointCharge = request.toVo();
-    Point chargedPoint = pointFacade.chargePoint(userId, pointCharge);
+        PointCharge pointCharge = request.toVo();
+        Point chargedPoint = pointFacade.chargePoint(userId, pointCharge);
 
-    return ApiResponse.success(PointV1Dto.PointResponse.fromEntity(chargedPoint));
-  }
+        return ApiResponse.success(PointV1Dto.PointResponse.fromEntity(chargedPoint));
+    }
 
 
 }

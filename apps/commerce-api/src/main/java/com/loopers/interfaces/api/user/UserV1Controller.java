@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
-public class UserV1Controller implements UserV1ApiSpec{
+public class UserV1Controller implements UserV1ApiSpec {
 
     private final UserFacade userFacade;
 

@@ -8,18 +8,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PointService {
 
-  private final PointRepository pointRepository;
+    private final PointRepository pointRepository;
 
-  public Point getPointByUserId(String userId) {
-    return pointRepository.findByUserId(userId).orElse(null);
-  }
+    public Point getPointByUserId(String userId) {
+        return pointRepository.findByUserId(userId).orElse(null);
+    }
 
-  public void initializePoints(User user) {
-    pointRepository.save(new Point(0, user.getUserId()));
+    public void initializePoints(User user) {
+        pointRepository.save(new Point(0, user.getUserId()));
 
-  }
+    }
 
-  public Point save(Point point) {
-    return pointRepository.save(point);
-  }
+    public Point save(Point point) {
+        return pointRepository.save(point);
+    }
 }
