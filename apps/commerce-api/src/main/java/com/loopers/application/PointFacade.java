@@ -7,13 +7,16 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
+@Transactional
 public class PointFacade {
 
     private final PointService pointService;
 
+    @Transactional(readOnly = true)
     public Point getPointByUserId(String userId) {
         return pointService.getPointByUserId(userId);
     }

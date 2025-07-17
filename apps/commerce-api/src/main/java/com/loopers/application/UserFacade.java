@@ -7,9 +7,11 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
+@Transactional
 public class UserFacade {
 
     private final UserService userService;
@@ -23,6 +25,7 @@ public class UserFacade {
         return signedUpUser;
     }
 
+    @Transactional(readOnly = true)
     public User getMe(String userId) {
         User me = userService.getMe(userId);
         if (me == null) {
