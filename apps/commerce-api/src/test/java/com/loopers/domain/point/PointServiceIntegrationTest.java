@@ -17,15 +17,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class PointServiceIntegrationTest {
 
-    private final PointService pointService;
     private final PointFacade pointFacade;
     private final PointRepository pointRepository;
     private final DatabaseCleanUp databaseCleanUp;
 
 
     @Autowired
-    public PointServiceIntegrationTest(PointService pointService, PointFacade pointFacade, PointRepository pointRepository, DatabaseCleanUp databaseCleanUp) {
-        this.pointService = pointService;
+    public PointServiceIntegrationTest(PointFacade pointFacade, PointRepository pointRepository, DatabaseCleanUp databaseCleanUp) {
         this.pointFacade = pointFacade;
         this.pointRepository = pointRepository;
         this.databaseCleanUp = databaseCleanUp;
@@ -56,7 +54,7 @@ class PointServiceIntegrationTest {
             pointRepository.save(point);
 
             //when
-            Point result = pointService.getPointByUserId(userId);
+            Point result = pointFacade.getPointByUserId(userId);
 
             //then
             Assertions.assertAll(
@@ -72,7 +70,7 @@ class PointServiceIntegrationTest {
             String userId = "gukin";
 
             //when
-            Point result = pointService.getPointByUserId(userId);
+            Point result = pointFacade.getPointByUserId(userId);
 
             //then
             assertThat(result).isNull();
