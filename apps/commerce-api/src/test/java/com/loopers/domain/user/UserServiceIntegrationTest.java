@@ -43,39 +43,39 @@ class UserServiceIntegrationTest {
         @Test
         void savesUserEntity_whenSignUpSuccessfully(){
             //given
-            UserEntity userEntity = UserEntity.builder()
-                    .loginId("gukin")
+            User user = User.builder()
+                    .userId("gukin")
                     .email("gukin@gmail.com")
                     .dateOfBirth("2025-07-15")
                     .gender(Gender.FEMALE)
                     .build();
 
             //when
-            userService.signUp(userEntity);
+            userService.signUp(user);
 
             //then
-            UserEntity savedUser = userRepository.findByLoginId("gukin").get();
+            User savedUser = userRepository.findByUserId("gukin").get();
             assertAll(
-                    () -> assertThat(savedUser.getLoginId()).isEqualTo(userEntity.getLoginId()),
-                    () -> assertThat(savedUser.getEmail()).isEqualTo(userEntity.getEmail()),
-                    () -> assertThat(savedUser.getDateOfBirth()).isEqualTo(userEntity.getDateOfBirth()),
-                    () -> assertThat(savedUser.getGender()).isEqualTo(userEntity.getGender()));
+                    () -> assertThat(savedUser.getUserId()).isEqualTo(user.getUserId()),
+                    () -> assertThat(savedUser.getEmail()).isEqualTo(user.getEmail()),
+                    () -> assertThat(savedUser.getDateOfBirth()).isEqualTo(user.getDateOfBirth()),
+                    () -> assertThat(savedUser.getGender()).isEqualTo(user.getGender()));
         }
 
         @DisplayName("이미 가입된 ID로 회원가입 시도 시, 실패한다")
         @Test
         void throwsBadRequestException_whenSignUpWithExistingUserId(){
             //given
-            UserEntity userEntity = UserEntity.builder()
-                    .loginId("gukin")
+            User user = User.builder()
+                    .userId("gukin")
                     .email("gukin@gmail.com")
                     .dateOfBirth("2025-07-15")
                     .gender(Gender.FEMALE)
                     .build();
-            userService.signUp(userEntity);
+            userService.signUp(user);
 
             //when
-            CoreException result = assertThrows(CoreException.class, () -> userService.signUp(userEntity));
+            CoreException result = assertThrows(CoreException.class, () -> userService.signUp(user));
 
             //then
             assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
@@ -93,33 +93,33 @@ class UserServiceIntegrationTest {
         @Test
         void returnsUserEntity_whenUserExists() {
             //given
-            UserEntity userEntity = UserEntity.builder()
-                .loginId("gukin")
+            User user = User.builder()
+                .userId("gukin")
                 .email("gukin@gmail.com")
                 .dateOfBirth("2025-07-15")
                 .gender(Gender.FEMALE)
                 .build();
-            userService.signUp(userEntity);
+            userService.signUp(user);
 
             //when
-            UserEntity result = userService.getMe(userEntity.getLoginId());
+            User result = userService.getMe(user.getUserId());
 
             //then
             assertAll(
-                () -> assertThat(result.getLoginId()).isEqualTo(userEntity.getLoginId()),
-                () -> assertThat(result.getEmail()).isEqualTo(userEntity.getEmail()),
-                () -> assertThat(result.getDateOfBirth()).isEqualTo(userEntity.getDateOfBirth()),
-                () -> assertThat(result.getGender()).isEqualTo(userEntity.getGender()));
+                () -> assertThat(result.getUserId()).isEqualTo(user.getUserId()),
+                () -> assertThat(result.getEmail()).isEqualTo(user.getEmail()),
+                () -> assertThat(result.getDateOfBirth()).isEqualTo(user.getDateOfBirth()),
+                () -> assertThat(result.getGender()).isEqualTo(user.getGender()));
         }
 
         @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다")
         @Test
         void returnsNull_whenUserDoesNotExist() {
             //given
-            String nonExistentLoginId = "nonExistentUser";
+            String nonExistentuserId = "nonExistentUser";
 
             //when
-            UserEntity result = userService.getMe(nonExistentLoginId);
+            User result = userService.getMe(nonExistentuserId);
 
             //then
             assertThat(result).isNull();

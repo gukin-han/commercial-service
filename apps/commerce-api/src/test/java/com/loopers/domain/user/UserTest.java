@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserEntityTest {
+class UserTest {
 
     /**
      * - [x]  ID 가 `영문 및 숫자 10자 이내` 형식에 맞지 않으면, User 객체 생성에 실패한다.
@@ -35,8 +35,8 @@ class UserEntityTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () ->
-                    UserEntity.builder()
-                            .loginId(userId)
+                    User.builder()
+                            .userId(userId)
                             .email(email)
                             .dateOfBirth(dateOfBirth)
                             .build());
@@ -61,8 +61,8 @@ class UserEntityTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () ->
-                    UserEntity.builder()
-                            .loginId(userId)
+                    User.builder()
+                            .userId(userId)
                             .email(email)
                             .dateOfBirth(dateOfBirth)
                             .build());
@@ -87,8 +87,8 @@ class UserEntityTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () ->
-                    UserEntity.builder()
-                            .loginId(userId)
+                    User.builder()
+                            .userId(userId)
                             .email(email)
                             .dateOfBirth(dateOfBirth)
                             .build());

@@ -1,6 +1,5 @@
 package com.loopers.interfaces.api.user;
 
-import com.loopers.domain.user.UserRepository;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.support.constant.Gender;
 import com.loopers.utils.DatabaseCleanUp;

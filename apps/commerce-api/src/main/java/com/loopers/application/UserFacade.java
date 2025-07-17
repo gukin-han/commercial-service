@@ -1,6 +1,7 @@
-package com.loopers.application.user;
+package com.loopers.application;
 
-import com.loopers.domain.user.UserEntity;
+import com.loopers.domain.point.PointService;
+import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -12,13 +13,18 @@ import org.springframework.stereotype.Component;
 public class UserFacade {
 
     private final UserService userService;
+    private final PointService pointService;
 
-    public UserEntity signUp(UserEntity userEntity) {
-        return userService.signUp(userEntity);
+    public User signUp(User user) {
+        User signedUpUser = userService.signUp(user);
+
+        pointService.initializePoints(signedUpUser);
+
+        return signedUpUser;
     }
 
-    public UserEntity getMe(String loginId) {
-        UserEntity me = userService.getMe(loginId);
+    public User getMe(String userId) {
+        User me = userService.getMe(userId);
         if (me == null) {
             throw new CoreException(ErrorType.NOT_FOUND, "사용자를 찾을 수 없습니다.");
         }

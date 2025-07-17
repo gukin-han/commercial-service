@@ -11,9 +11,9 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserEntity signUp(UserEntity user) {
+    public User signUp(User user) {
         // 유저 정보 검증
-        userRepository.findByLoginId(user.getLoginId())
+        userRepository.findByUserId(user.getUserId())
                 .ifPresent(existingUser -> {
                     throw new CoreException(ErrorType.BAD_REQUEST, "이미 가입된 ID 입니다.");
                 });
@@ -22,8 +22,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-  public UserEntity getMe(String LoginId) {
-        return userRepository.findByLoginId(LoginId).orElse(null);
+  public User getMe(String userId) {
+        return userRepository.findByUserId(userId).orElse(null);
 
   }
 }
