@@ -2,7 +2,7 @@ package com.loopers.domain.point;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.loopers.application.PointFacade;
+import com.loopers.application.point.PointAppService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -17,14 +17,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class PointServiceIntegrationTest {
 
-    private final PointFacade pointFacade;
+    private final PointAppService pointAppService;
     private final PointRepository pointRepository;
     private final DatabaseCleanUp databaseCleanUp;
 
 
     @Autowired
-    public PointServiceIntegrationTest(PointFacade pointFacade, PointRepository pointRepository, DatabaseCleanUp databaseCleanUp) {
-        this.pointFacade = pointFacade;
+    public PointServiceIntegrationTest(PointAppService pointAppService, PointRepository pointRepository, DatabaseCleanUp databaseCleanUp) {
+        this.pointAppService = pointAppService;
         this.pointRepository = pointRepository;
         this.databaseCleanUp = databaseCleanUp;
     }
@@ -54,7 +54,7 @@ class PointServiceIntegrationTest {
             pointRepository.save(point);
 
             //when
-            Point result = pointFacade.getPointByUserId(userId);
+            Point result = pointAppService.getPointByUserId(userId);
 
             //then
             Assertions.assertAll(
@@ -70,7 +70,7 @@ class PointServiceIntegrationTest {
             String userId = "gukin";
 
             //when
-            Point result = pointFacade.getPointByUserId(userId);
+            Point result = pointAppService.getPointByUserId(userId);
 
             //then
             assertThat(result).isNull();
@@ -92,7 +92,7 @@ class PointServiceIntegrationTest {
             PointCharge pointCharge = new PointCharge(1000L);// 충전 금액은 1000원으로 설정
 
             //when
-            CoreException exception = Assertions.assertThrows(CoreException.class, () -> pointFacade.chargePoint(userId, pointCharge));
+            CoreException exception = Assertions.assertThrows(CoreException.class, () -> pointAppService.chargePoint(userId, pointCharge));
 
             //then
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);

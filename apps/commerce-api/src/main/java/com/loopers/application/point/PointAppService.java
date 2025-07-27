@@ -1,4 +1,4 @@
-package com.loopers.application;
+package com.loopers.application.point;
 
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointCharge;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 @Transactional
-public class PointFacade {
+public class PointAppService {
 
     private final PointService pointService;
 
