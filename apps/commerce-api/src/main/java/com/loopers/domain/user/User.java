@@ -6,24 +6,25 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
+@Entity
 public class User extends BaseEntity {
 
-    private String userId;
+    private String loginId;
     private String email;
     private String dateOfBirth;
     private Gender gender;
 
     @Builder
-    public User(String userId, String email, String dateOfBirth, Gender gender) {
-        if (userId == null || !userId.matches("^[a-zA-Z0-9]{1,10}$")) {
+    public User(String loginId, String email, String dateOfBirth, Gender gender) {
+        if (loginId == null || !loginId.matches("^[a-zA-Z0-9]{1,10}$")) {
             throw new CoreException(ErrorType.BAD_REQUEST, "아이디는 영문 및 숫자 10자 이내로 입력해야 합니다.");
         }
 
@@ -39,7 +40,7 @@ public class User extends BaseEntity {
             throw new CoreException(ErrorType.BAD_REQUEST, "성별은 필수 입력 항목입니다.");
         }
 
-        this.userId = userId;
+        this.loginId = loginId;
         this.email = email;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;

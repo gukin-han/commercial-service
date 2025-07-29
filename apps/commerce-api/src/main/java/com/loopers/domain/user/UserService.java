@@ -13,7 +13,7 @@ public class UserService {
 
     public User signUp(User user) {
         // 유저 정보 검증
-        userRepository.findByUserId(user.getUserId())
+        userRepository.findByLoginId(user.getLoginId())
                 .ifPresent(existingUser -> {
                     throw new CoreException(ErrorType.BAD_REQUEST, "이미 가입된 ID 입니다.");
                 });
@@ -22,8 +22,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User getMe(String userId) {
-        return userRepository.findByUserId(userId).orElse(null);
-
+    public User getMe(String loginId) {
+        return userRepository.findByLoginId(loginId).orElse(null);
     }
 }

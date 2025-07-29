@@ -3,13 +3,15 @@ package com.loopers.domain.product;
 import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "products")
+@Entity
 public class Product extends BaseEntity {
 
     @Embedded
@@ -30,7 +32,7 @@ public class Product extends BaseEntity {
 
     public void decreaseStock(long quantity) {
 
-        this.checkDecreasableBy();
+        this.canDecrease();
         Stock decreasedStock = stock.decrease(quantity);
         if (decreasedStock.isSoldOut()) {
             this.status = ProductStatus.SOLD_OUT;
@@ -38,7 +40,7 @@ public class Product extends BaseEntity {
         this.stock = decreasedStock;
     }
 
-    private void checkDecreasableBy() {
+    private void canDecrease() {
         if (this.status == ProductStatus.SOLD_OUT) {
             throw new CoreException(ErrorType.CONFLICT, "재고 수량이 없습니다.");
         }

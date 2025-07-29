@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PointJpaRepository extends JpaRepository<Point, Long> {
 
-    Optional<Point> findByUserId(String userId);
+    Optional<Point> findByLoginId(String loginId);
 }

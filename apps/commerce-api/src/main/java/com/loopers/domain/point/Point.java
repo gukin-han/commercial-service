@@ -9,19 +9,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Getter
 @NoArgsConstructor
 @Table(name = "points")
+@Entity
 public class Point extends BaseEntity {
 
     private long balance;
 
-    private String userId;
+    private String loginId;
 
     @Builder
-    public Point(long balance, String userId) {
-        if (userId == null || userId.isEmpty()) {
+    public Point(long balance, String loginId) {
+        if (loginId == null || loginId.isEmpty()) {
             throw new CoreException(ErrorType.BAD_REQUEST, "유저 아이디는 필수 입력 항목입니다.");
         }
 
@@ -30,7 +30,7 @@ public class Point extends BaseEntity {
         }
 
         this.balance = balance;
-        this.userId = userId;
+        this.loginId = loginId;
     }
 
     public void add(long amount) {

@@ -28,7 +28,7 @@ class UserTest {
                 "user-id",    // 하이픈 포함
                 "gukingukin1" // 10자 초과
         })
-        void throwsBadRequestException_whenInvalidUserIdProvided(String userId) {
+        void throwsBadRequestException_whenInvalidUserIdProvided(String loginId) {
             //given
             String email = "gukin@gamil.com";
             String dateOfBirth = "2024-01-01";
@@ -36,7 +36,7 @@ class UserTest {
             //when
             CoreException result = assertThrows(CoreException.class, () ->
                     User.builder()
-                            .userId(userId)
+                            .loginId(loginId)
                             .email(email)
                             .dateOfBirth(dateOfBirth)
                             .build());
@@ -56,13 +56,13 @@ class UserTest {
         })
         void throwsBadRequestException_whenInvalidEmailProvided(String email) {
             //given
-            String userId = "gukin";
+            String loginId = "gukin";
             String dateOfBirth = "2024-01-01";
 
             //when
             CoreException result = assertThrows(CoreException.class, () ->
                     User.builder()
-                            .userId(userId)
+                            .loginId(loginId)
                             .email(email)
                             .dateOfBirth(dateOfBirth)
                             .build());
@@ -82,13 +82,13 @@ class UserTest {
         })
         void throwsBadRequestException_whenInvalidDateOfBirthProvided(String dateOfBirth) {
             //given
-            String userId = "gukin";
+            String loginId = "gukin";
             String email = "gukin@gmail.com";
 
             //when
             CoreException result = assertThrows(CoreException.class, () ->
                     User.builder()
-                            .userId(userId)
+                            .loginId(loginId)
                             .email(email)
                             .dateOfBirth(dateOfBirth)
                             .build());

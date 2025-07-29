@@ -11,11 +11,11 @@ public class PointService {
     private final PointRepository pointRepository;
 
     public Point getPointByUserId(String userId) {
-        return pointRepository.findByUserId(userId).orElse(null);
+        return pointRepository.findByLoginId(userId).orElse(null);
     }
 
     public void initializePoints(User user) {
-        pointRepository.save(new Point(0, user.getUserId()));
+        pointRepository.save(new Point(0, user.getLoginId()));
 
     }
 
