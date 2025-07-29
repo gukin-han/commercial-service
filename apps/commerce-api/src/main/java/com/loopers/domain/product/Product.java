@@ -1,0 +1,61 @@
+package com.loopers.domain.product;
+
+import com.loopers.domain.BaseEntity;
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.Getter;
+
+@Getter
+public class Product extends BaseEntity {
+
+    @Embedded
+    private Stock stock;
+
+    @Column(nullable=false)
+    private long likeCount;
+
+    @Enumerated(value = EnumType.STRING)
+    private ProductStatus status;
+
+    public Product(long stockQuantity) {
+
+        this.stock = Stock.of(stockQuantity);
+        this.likeCount = 0;
+        this.status = ProductStatus.ACTIVE;
+    }
+
+    public void decreaseStock(long quantity) {
+
+        this.checkDecreasableBy();
+        Stock decreasedStock = stock.decrease(quantity);
+        if (decreasedStock.isSoldOut()) {
+            this.status = ProductStatus.SOLD_OUT;
+        }
+        this.stock = decreasedStock;
+    }
+
+    private void checkDecreasableBy() {
+        if (this.status == ProductStatus.SOLD_OUT) {
+            throw new CoreException(ErrorType.CONFLICT, "재고 수량이 없습니다.");
+        }
+
+        if (this.status == ProductStatus.STOPPED) {
+            throw new CoreException(ErrorType.CONFLICT, "판매가 중단된 상품입니다.");
+        }
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        if (this.likeCount - 1 < 0) {
+            throw new CoreException(ErrorType.CONFLICT, "상품의 좋아요 수는 0보다 작을 수 없습니다.");
+        }
+        this.likeCount--;
+    }
+}
