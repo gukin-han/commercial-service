@@ -1,12 +1,25 @@
 package com.loopers.domain.brand;
 
 import com.loopers.domain.BaseEntity;
+import jakarta.persistence.Entity;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
 public class Brand extends BaseEntity {
 
     private String name;
 
-    public Brand(String name) {
+    @Builder
+    private Brand(String name) {
         this.name = name;
+    }
+
+    public static Brand create(String name) {
+        return Brand.builder()
+                .name(name)
+                .build();
     }
 }
