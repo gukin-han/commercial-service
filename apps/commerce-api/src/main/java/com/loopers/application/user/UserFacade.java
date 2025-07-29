@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 @Transactional
-public class UserAppService {
+public class UserFacade {
 
     private final UserService userService;
     private final PointService pointService;

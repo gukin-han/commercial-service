@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api.point;
 
-import com.loopers.application.point.PointAppService;
+import com.loopers.application.point.PointFacade;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointCharge;
 import com.loopers.interfaces.api.ApiResponse;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PointV1Controller implements PointV1ApiSpec {
 
-    private final PointAppService pointAppService;
+    private final PointFacade pointFacade;
 
     @Override
     @GetMapping
@@ -29,7 +29,7 @@ public class PointV1Controller implements PointV1ApiSpec {
         if (userId == null || userId.isBlank()) {
             throw new CoreException(ErrorType.BAD_REQUEST);
         }
-        Point point = pointAppService.getPointByUserId(userId);
+        Point point = pointFacade.getPointByUserId(userId);
         PointV1Dto.PointResponse response = PointResponse.fromEntity(point);
         return ApiResponse.success(response);
     }
@@ -40,7 +40,7 @@ public class PointV1Controller implements PointV1ApiSpec {
             @RequestHeader("X-USER-ID") String userId, @RequestBody PointV1Dto.ChargeRequest request) {
 
         PointCharge pointCharge = request.toVo();
-        Point chargedPoint = pointAppService.chargePoint(userId, pointCharge);
+        Point chargedPoint = pointFacade.chargePoint(userId, pointCharge);
 
         return ApiResponse.success(PointV1Dto.PointResponse.fromEntity(chargedPoint));
     }
