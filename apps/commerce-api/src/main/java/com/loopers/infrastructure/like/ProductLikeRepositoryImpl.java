@@ -2,11 +2,11 @@ package com.loopers.infrastructure.like;
 
 import com.loopers.domain.like.ProductLikeRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Repository
-public class ProductRepositoryImpl implements ProductLikeRepository {
+@Component
+public class ProductLikeRepositoryImpl implements ProductLikeRepository {
 
     private final ProductLikeJpaRepository productLikeJpaRepository;
 }

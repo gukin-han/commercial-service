@@ -1,6 +1,7 @@
 package com.loopers.domain.product;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.brand.BrandId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;
@@ -22,6 +23,11 @@ public class Product extends BaseEntity {
 
     @Enumerated(value = EnumType.STRING)
     private ProductStatus status;
+
+    private String name;
+
+    @Embedded
+    private BrandId brandId;
 
     public Product(long stockQuantity) {
 
@@ -59,5 +65,9 @@ public class Product extends BaseEntity {
             throw new CoreException(ErrorType.CONFLICT, "상품의 좋아요 수는 0보다 작을 수 없습니다.");
         }
         this.likeCount--;
+    }
+
+    public ProductId getProductId() {
+        return ProductId.of(super.getId());
     }
 }
