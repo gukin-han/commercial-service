@@ -26,4 +26,9 @@ public class Brand extends BaseEntity {
                 .name(name)
                 .build();
     }
+
+
+    public BrandId getBrandId() {
+        return getId() == null ? null : BrandId.of(getId());
+    }
 }

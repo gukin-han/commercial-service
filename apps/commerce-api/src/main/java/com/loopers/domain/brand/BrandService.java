@@ -6,6 +6,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Component
 public class BrandService {
@@ -17,5 +19,9 @@ public class BrandService {
                 ErrorType.NOT_FOUND,
                 String.format("브랜드 ID %s에 해당하는 브랜드를 찾을 수 없습니다.", brandId.getValue())
         ));
+    }
+
+    public List<Brand> findAllByIds(List<BrandId> brandIds) {
+        return brandRepository.findAllByBrandIdIn(brandIds);
     }
 }

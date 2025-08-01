@@ -11,4 +11,6 @@ public interface ProductRepository {
     List<Product> findProducts(int page, int size, ProductSortType productSortType);
 
     Product save(Product product);
+
+    long getTotalCount();
 }

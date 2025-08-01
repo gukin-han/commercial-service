@@ -17,8 +17,4 @@ public class ProductService {
         return productRepository.findById(productId.getValue())
                 .orElseThrow(EntityNotFoundException::new);
     }
-
-    public List<Product> findProducts(int page, int size, String keyword, ProductSortType productSortType) {
-        return null;
-    }
 }

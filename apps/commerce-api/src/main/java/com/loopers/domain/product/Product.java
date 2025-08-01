@@ -34,6 +34,16 @@ public class Product extends BaseEntity {
     @Embedded
     private BrandId brandId;
 
+    @Builder
+    private Product(Stock stock, long likeCount, ProductStatus status, String name, Money price, BrandId brandId) {
+        this.stock = stock;
+        this.likeCount = likeCount;
+        this.status = status;
+        this.name = name;
+        this.price = price;
+        this.brandId = brandId;
+    }
+
     public Product(long stockQuantity) {
 
         this.stock = Stock.of(stockQuantity);

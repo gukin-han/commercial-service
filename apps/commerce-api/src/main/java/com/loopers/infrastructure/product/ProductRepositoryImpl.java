@@ -40,6 +40,10 @@ public class ProductRepositoryImpl implements ProductRepository {
         return productJpaRepository.save(product);
     }
 
+    @Override
+    public long getTotalCount() {
+        return productJpaRepository.count();
+    }
 
     private OrderSpecifier<?> productSort(ProductSortType productSortType) {
         return switch (productSortType) {

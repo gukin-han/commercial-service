@@ -1,6 +1,5 @@
 package com.loopers.application.product;
 
-import com.loopers.domain.BaseEntity;
 import com.loopers.domain.brand.BrandService;
 import com.loopers.application.common.dto.PagedResult;
 import com.loopers.application.product.dto.ProductDetailQuery;
@@ -40,14 +39,29 @@ public class ProductFacade {
 
     @Transactional(readOnly = true)
     public PagedResult<ProductSummaryView> getPagedProducts(ProductPageQuery query) {
-        List<Product> products = productRepository.findProducts(
-                query.page(),
-                query.size(),
-                query.sortType()
-        );
+        List<Product> products = productRepository.findProducts(query.page(), query.size(), query.sortType());
+        Map<BrandId, Brand> brandMap = getBrandIdToBrandMapFrom(products);
+        List<ProductSummaryView> views = this.createProductSummaryViewsFrom(products, brandMap);
 
-        Map<Long, Product> idToProductMap = products.stream()
-                .collect(Collectors.toMap(BaseEntity::getId, p -> p));
-        return null;
+        return PagedResult.of(views, query.page(), productRepository.getTotalCount(), query.size());
+    }
+
+    private Map<BrandId, Brand> getBrandIdToBrandMapFrom(List<Product> products) {
+        List<BrandId> brandIds = products.stream()
+                .map(Product::getBrandId)
+                .distinct()
+                .toList();
+
+        return brandService.findAllByIds(brandIds).stream()
+                .collect(Collectors.toMap(Brand::getBrandId, b -> b));
+    }
+
+    private List<ProductSummaryView> createProductSummaryViewsFrom(List<Product> products, Map<BrandId, Brand> brandMap) {
+        return products.stream()
+                .map(p -> {
+                    Brand b = brandMap.get(p.getBrandId());
+                    return ProductSummaryView.of(p, b);
+                })
+                .toList();
     }
 }

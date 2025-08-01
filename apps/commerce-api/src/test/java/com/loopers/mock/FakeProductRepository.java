@@ -8,9 +8,11 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 public class FakeProductRepository implements ProductRepository {
 
@@ -29,6 +31,11 @@ public class FakeProductRepository implements ProductRepository {
             data.add(product);
         }
         return product;
+    }
+
+    @Override
+    public long getTotalCount() {
+        return data.size(); // 전체 데이터 수 반환
     }
 
     private void setIdByReflection(Product product, Long id) {
@@ -50,7 +57,26 @@ public class FakeProductRepository implements ProductRepository {
 
     @Override
     public List<Product> findProducts(int page, int size, ProductSortType productSortType) {
-        return new ArrayList<>(data);
+        // 1. 정렬
+        Comparator<Product> comparator = switch (productSortType) {
+            case LATEST -> Comparator.comparing(Product::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder()));
+            case PRICE_ASC -> Comparator.comparing(product -> product.getPrice().getValue());
+            case LIKES_DESC -> Comparator.comparing(Product::getLikeCount, Comparator.reverseOrder());
+        };
+
+        List<Product> sortedList = data.stream()
+                .sorted(comparator)
+                .collect(Collectors.toList());
+
+        // 2. 페이징
+        int start = (page - 1) * size;
+        int end = Math.min(start + size, sortedList.size());
+
+        if (start >= sortedList.size()) {
+            return Collections.emptyList(); // 페이지 범위를 벗어나면 빈 리스트 반환
+        }
+
+        return sortedList.subList(start, end);
     }
 
     public void clear() {
