@@ -23,7 +23,7 @@ public class User extends BaseEntity {
     private Gender gender;
 
     @Builder
-    public User(String loginId, String email, String dateOfBirth, Gender gender) {
+    private User(String loginId, String email, String dateOfBirth, Gender gender) {
         if (loginId == null || !loginId.matches("^[a-zA-Z0-9]{1,10}$")) {
             throw new CoreException(ErrorType.BAD_REQUEST, "아이디는 영문 및 숫자 10자 이내로 입력해야 합니다.");
         }
@@ -44,5 +44,18 @@ public class User extends BaseEntity {
         this.email = email;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
+    }
+
+    public static User create(String loginId, String email, String dateOfBirth, Gender gender) {
+        return User.builder()
+                .loginId(loginId)
+                .email(email)
+                .dateOfBirth(dateOfBirth)
+                .gender(Gender.MALE)
+                .build();
+    }
+
+    public UserId getUserId() {
+        return getId() == null ? null : UserId.of(getId());
     }
 }

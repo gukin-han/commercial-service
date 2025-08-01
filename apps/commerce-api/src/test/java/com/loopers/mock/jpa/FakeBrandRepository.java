@@ -1,8 +1,7 @@
-package com.loopers.mock;
+package com.loopers.mock.jpa;
 
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
-import com.loopers.mock.jpa.FakeJpaRepository;
 
 import java.util.List;
 import java.util.Optional;

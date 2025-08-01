@@ -2,6 +2,7 @@ package com.loopers.domain.user;
 
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +25,9 @@ public class UserService {
 
     public User getMe(String loginId) {
         return userRepository.findByLoginId(loginId).orElse(null);
+    }
+
+    public User findByUserId(UserId userId) {
+        return userRepository.findByUserId(userId.getValue()).orElseThrow(EntityNotFoundException::new);
     }
 }

@@ -1,6 +1,5 @@
-package com.loopers.domain.product;
+package com.loopers.domain.like;
 
-import com.loopers.domain.brand.BrandId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -12,19 +11,19 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
-public class ProductId{
+public class ProductLikeId {
 
-    @Column(name = "product_id")
+    @Column(name = "product_like_id")
     private Long value;
 
-    public ProductId(Long value) {
+    public ProductLikeId(Long value) {
         if (value == null || value <= 0) {
-            throw new IllegalArgumentException("Product ID는 null이 아니며 0보다 커야 합니다.");
+            throw new IllegalArgumentException("ProductLike ID는 null이 아니며 0보다 커야 합니다.");
         }
         this.value = value;
     }
 
-    public static ProductId of(Long value) {
-        return new ProductId(value);
+    public static ProductLikeId of(Long value) {
+        return new ProductLikeId(value);
     }
 }

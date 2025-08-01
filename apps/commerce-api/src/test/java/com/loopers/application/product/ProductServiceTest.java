@@ -3,7 +3,7 @@ package com.loopers.application.product;
 import com.loopers.domain.product.ProductId;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.product.ProductService;
-import com.loopers.mock.FakeProductRepository;
+import com.loopers.mock.jpa.FakeProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

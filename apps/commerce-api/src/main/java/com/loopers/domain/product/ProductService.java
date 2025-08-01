@@ -14,7 +14,6 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     public Product findByProductId(ProductId productId) {
-        return productRepository.findById(productId.getValue())
-                .orElseThrow(EntityNotFoundException::new);
+        return productRepository.findById(productId.getValue()).orElseThrow(EntityNotFoundException::new);
     }
 }

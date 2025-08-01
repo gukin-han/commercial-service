@@ -1,9 +1,8 @@
-package com.loopers.mock;
+package com.loopers.mock.jpa;
 
 import com.loopers.application.product.dto.ProductSortType;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.mock.jpa.FakeJpaRepository;
 
 import java.util.Comparator;
 import java.util.Collections;

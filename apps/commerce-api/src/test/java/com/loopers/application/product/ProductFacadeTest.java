@@ -6,8 +6,8 @@ import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandId;
 import com.loopers.domain.brand.BrandService;
 import com.loopers.domain.product.*;
-import com.loopers.mock.FakeBrandRepository;
-import com.loopers.mock.FakeProductRepository;
+import com.loopers.mock.jpa.FakeBrandRepository;
+import com.loopers.mock.jpa.FakeProductRepository;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
