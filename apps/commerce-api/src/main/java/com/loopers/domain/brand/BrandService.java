@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -22,6 +23,6 @@ public class BrandService {
     }
 
     public List<Brand> findAllByIds(List<BrandId> brandIds) {
-        return brandRepository.findAllByBrandIdIn(brandIds);
+        return brandRepository.findAllByBrandIdIn(brandIds.stream().map(BrandId::getValue).collect(Collectors.toList()));
     }
 }

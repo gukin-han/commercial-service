@@ -31,9 +31,8 @@ public class BrandRepositoryImpl implements BrandRepository {
     }
 
     @Override
-    public List<Brand> findAllByBrandIdIn(List<BrandId> brandIds) {
-        return jpaQueryFactory.selectFrom(brand)
-                .where(brand.brandId.in(brandIds))
-                .fetch();
+    public List<Brand> findAllByBrandIdIn(List<Long> brandIds) {
+
+        return brandJpaRepository.findAllById(brandIds);
     }
 }
