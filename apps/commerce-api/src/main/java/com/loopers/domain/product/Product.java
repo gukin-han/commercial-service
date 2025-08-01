@@ -83,6 +83,6 @@ public class Product extends BaseEntity {
     }
 
     public ProductId getProductId() {
-        return ProductId.of(super.getId());
+        return getId() == null ? null : ProductId.of(getId());
     }
 }

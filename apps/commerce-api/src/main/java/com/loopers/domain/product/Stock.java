@@ -4,10 +4,7 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Embeddable
@@ -17,6 +14,7 @@ public class Stock {
     @Column(name = "stock_quantity")
     private long quantity;
 
+    @Builder
     private Stock(long quantity) {
 
         if (quantity < 0) {
@@ -27,7 +25,9 @@ public class Stock {
     }
 
     public static Stock of(long quantity) {
-        return new Stock(quantity);
+        return Stock.builder()
+                .quantity(quantity)
+                .build();
     }
 
     public Stock decrease(long quantity) {
