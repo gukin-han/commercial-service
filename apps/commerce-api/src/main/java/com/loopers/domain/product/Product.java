@@ -6,8 +6,10 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,6 +27,9 @@ public class Product extends BaseEntity {
     private ProductStatus status;
 
     private String name;
+
+    @Embedded
+    private Money price;
 
     @Embedded
     private BrandId brandId;

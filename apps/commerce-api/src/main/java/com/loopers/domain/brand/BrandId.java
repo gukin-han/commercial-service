@@ -1,8 +1,20 @@
 package com.loopers.domain.brand;
 
-public record BrandId (Long value) {
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-    public BrandId {
+@Getter
+@Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class BrandId{
+
+    @Column(name = "brand_id")
+    private Long value;
+
+    public BrandId(Long value) {
         if (value == null || value < 0) {
             throw new IllegalArgumentException("Brand ID는 null이 아니며 0보다 커야 합니다.");
         }
