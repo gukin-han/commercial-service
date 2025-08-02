@@ -1,8 +1,10 @@
 package com.loopers.domain.point;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.user.UserId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -18,6 +20,9 @@ public class Point extends BaseEntity {
     private long balance;
 
     private String loginId;
+
+    @Embedded
+    private UserId userId;
 
     @Builder
     public Point(long balance, String loginId) {
@@ -39,5 +44,13 @@ public class Point extends BaseEntity {
         }
 
         this.balance += amount;
+    }
+
+    public void deduct(Long amount) {
+        long remaining = balance - amount;
+        if (remaining < 0) {
+            throw new IllegalStateException("포인트가 부족합니다 : " + Math.abs(remaining));
+        }
+        this.balance = balance - amount;
     }
 }

@@ -7,4 +7,6 @@ public interface PointRepository {
     Optional<Point> findByLoginId(String loginId);
 
     Point save(Point point);
+
+    Optional<Point> findByUserId(Long value);
 }

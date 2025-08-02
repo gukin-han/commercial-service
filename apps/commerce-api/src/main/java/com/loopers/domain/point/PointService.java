@@ -1,8 +1,11 @@
 package com.loopers.domain.point;
 
 import com.loopers.domain.user.User;
+import com.loopers.domain.user.UserId;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +19,14 @@ public class PointService {
 
     public void initializePoints(User user) {
         pointRepository.save(new Point(0, user.getLoginId()));
+    }
 
+    public Point findByUserId(UserId userId) {
+        return pointRepository.findByUserId(userId.getValue()).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public void deductPoint(Point point, Long amount) {
+        point.deduct(amount);
     }
 
     public Point save(Point point) {

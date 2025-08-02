@@ -23,4 +23,9 @@ public class PointRepositoryImpl implements PointRepository {
     public Point save(Point point) {
         return pointJpaRepository.save(point);
     }
+
+    @Override
+    public Optional<Point> findByUserId(Long userId) {
+        return pointJpaRepository.findByUserId(userId);
+    }
 }

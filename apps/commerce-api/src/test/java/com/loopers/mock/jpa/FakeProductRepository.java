@@ -30,6 +30,11 @@ public class FakeProductRepository extends FakeJpaRepository<Product> implements
     }
 
     @Override
+    public List<Product> findAllByIds(List<Long> productIds) {
+        return null;
+    }
+
+    @Override
     public List<Product> findProducts(int page, int size, ProductSortType productSortType) {
         Comparator<Product> comparator = switch (productSortType) {
             case LATEST -> Comparator.comparing(Product::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder()));
