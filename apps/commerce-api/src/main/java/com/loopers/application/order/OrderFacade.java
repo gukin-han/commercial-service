@@ -1,8 +1,13 @@
 package com.loopers.application.order;
 
+import com.loopers.application.coupon.CouponQueryService;
 import com.loopers.application.order.dto.Cart;
 import com.loopers.application.order.dto.PlaceOrderCommand;
 import com.loopers.application.order.dto.PlaceOrderResult;
+import com.loopers.domain.coupon.Coupon;
+import com.loopers.domain.coupon.CouponDiscountCalculator;
+import com.loopers.domain.coupon.CouponId;
+import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.point.Point;
@@ -21,13 +26,14 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-@Transactional
 public class OrderFacade {
 
     private final ProductService productService;
     private final UserService userService;
     private final PointService pointService;
     private final OrderService orderService;
+    private final CouponQueryService couponQueryService;
+    private final CouponRepository couponRepository;
 
     @Transactional
     public PlaceOrderResult placeOrder(PlaceOrderCommand command) {
@@ -44,14 +50,20 @@ public class OrderFacade {
         productService.deductStocks(products, productIdToStockMap);
         Money totalPrice = productService.calculateTotalPrice(products, productIdToStockMap);
 
-        // 4. 포인트 차감
+        // 4. 쿠폰 조회
+        Coupon coupon = couponQueryService.getCouponByCouponIdAndUserId(CouponId.of(command.getCouponId()), user.getUserId());
+        CouponDiscountCalculator calculator = new CouponDiscountCalculator();
+        Money discountAmount = calculator.calculateDiscountAmount(coupon, totalPrice);
+
+        // 5. 포인트 차감
         Point point = pointService.findByUserId(user.getUserId());
-        pointService.deductPoint(point, totalPrice.getValue().longValue());
+        pointService.deductPoint(point, totalPrice.subtract(discountAmount));
 
-        // 5. 주문 생성
-        Order order = orderService.create(user, productIdToStockMap, totalPrice);
-
-        return PlaceOrderResult.SUCCESS();
+        // 6. 주문 생성
+        Order order = orderService.create(user, productIdToStockMap, totalPrice, discountAmount);
+        coupon.use(order);
+        couponRepository.save(coupon);
+        return PlaceOrderResult.SUCCESS(order);
     }
 
 

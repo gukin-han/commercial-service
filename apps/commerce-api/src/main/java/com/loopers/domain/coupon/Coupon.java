@@ -1,6 +1,8 @@
 package com.loopers.domain.coupon;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.order.Order;
+import com.loopers.domain.order.OrderId;
 import com.loopers.domain.product.Money;
 import com.loopers.domain.user.UserId;
 import jakarta.persistence.*;
@@ -8,8 +10,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.ZonedDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,10 +29,14 @@ public class Coupon extends BaseEntity {
     @Embedded
     private Percent discountRate;
 
-    private ZonedDateTime usedAt;
+    @Embedded
+    private OrderId orderId;
+
+    @Enumerated(value = EnumType.STRING)
+    private CouponStatus status;
 
     @Builder
-    private Coupon(CouponType type, UserId userId, Money amount, Percent discountRate) {
+    private Coupon(CouponType type, UserId userId, Money amount, Percent discountRate, CouponStatus status) {
         if (type == null || userId == null) {
             throw new IllegalArgumentException("쿠폰 타입과 유저아이디는 필수 입력값입니다.");
         }
@@ -79,4 +83,18 @@ public class Coupon extends BaseEntity {
         return getId() == null ? null : CouponId.of(getId());
     }
 
+    public void use(Order order) {
+        this.orderId = order.getOrderId();
+        this.status = CouponStatus.USED;
+    }
+
+    public void cancelUse() {
+        this.orderId = null;
+        this.status = CouponStatus.AVAILABLE;
+    }
+
+}
+
+enum CouponStatus {
+    AVAILABLE, USED, CANCELED
 }

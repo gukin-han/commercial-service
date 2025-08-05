@@ -3,7 +3,6 @@ package com.loopers.infrastructure.coupon;
 import com.loopers.domain.coupon.Coupon;
 import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.coupon.CouponType;
-import com.loopers.domain.coupon.Percent;
 import com.loopers.domain.product.Money;
 import com.loopers.domain.user.UserId;
 import com.loopers.utils.DatabaseCleanUp;
@@ -48,7 +47,7 @@ class CouponRepositoryImplIntegrationTest {
             Coupon savedCoupon = couponRepository.save(coupon);
 
             //when
-            Optional<Coupon> optionalCoupon = couponRepository.findByUserId(savedCoupon.getUserId());
+            Optional<Coupon> optionalCoupon = couponRepository.findByIdAndCouponId(savedCoupon.getCouponId(), savedCoupon.getUserId());
 
             //then
             assertThat(optionalCoupon.isPresent()).isTrue();

@@ -22,7 +22,12 @@ public class Order extends BaseEntity {
     private UserId userId;
 
     @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "total_price"))
     private Money totalPrice;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "discount_amount"))
+    private Money discountAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -32,13 +37,14 @@ public class Order extends BaseEntity {
 
 
     @Builder
-    private Order(UserId userId, Money totalPrice, OrderStatus status) {
+    private Order(UserId userId, Money totalPrice, Money discountAmount, OrderStatus status) {
         this.userId = userId;
         this.totalPrice = totalPrice;
+        this.discountAmount = discountAmount;
         this.status = status;
     }
 
-    public static Order of(UserId userId, Money totalPrice, OrderStatus status) {
+    public static Order of(UserId userId, Money totalPrice, Money discountAmount, OrderStatus status) {
         return Order.builder()
                 .userId(userId)
                 .totalPrice(totalPrice)

@@ -5,6 +5,7 @@ import com.loopers.support.error.ErrorType;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class UserService {
         return userRepository.findByLoginId(loginId).orElse(null);
     }
 
+    @Transactional
     public User findByUserId(UserId userId) {
         return userRepository.findByUserId(userId.getValue()).orElseThrow(EntityNotFoundException::new);
     }

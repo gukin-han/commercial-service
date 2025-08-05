@@ -6,6 +6,7 @@ import com.loopers.domain.product.Stock;
 import com.loopers.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,9 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
-    public Order create(User user, Map<ProductId, Stock> productIdToStockMap, Money totalPrice) {
-        Order order = Order.of(user.getUserId(), totalPrice, OrderStatus.PAID);
+    @Transactional
+    public Order create(User user, Map<ProductId, Stock> productIdToStockMap, Money totalPrice, Money discountAmount) {
+        Order order = Order.of(user.getUserId(), totalPrice, discountAmount, OrderStatus.PAID);
         orderRepository.save(order);
 
         List<OrderItem> orderItems = productIdToStockMap.entrySet().stream()
@@ -26,7 +28,6 @@ public class OrderService {
                 .toList();
 
         orderItemRepository.saveAll(orderItems);
-
         return order;
     }
 }

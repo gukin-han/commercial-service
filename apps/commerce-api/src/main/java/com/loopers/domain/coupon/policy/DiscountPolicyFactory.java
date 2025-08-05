@@ -1,5 +1,6 @@
 package com.loopers.domain.coupon.policy;
 
+import com.loopers.domain.coupon.Coupon;
 import com.loopers.domain.coupon.CouponType;
 import com.loopers.domain.coupon.Percent;
 import com.loopers.domain.product.Money;
@@ -14,13 +15,13 @@ public class DiscountPolicyFactory {
             CouponType.CAPPED_PERCENTAGE, params -> new CappedPercentageDiscountPolicy(params.percent(), params.amount())
     );
 
-    public static DiscountPolicy create(CouponType type, Money amount, Percent percent) {
-        Function<DiscountPolicyParams, DiscountPolicy> creator = registry.get(type);
+    public static DiscountPolicy create(Coupon coupon) {
+        Function<DiscountPolicyParams, DiscountPolicy> creator = registry.get(coupon.getType());
         if (creator == null) {
-            throw new IllegalArgumentException("지원하지 않는 쿠폰 타입: " + type);
+            throw new IllegalArgumentException("지원하지 않는 쿠폰 타입: " + coupon.getType());
         }
-        return creator.apply(new DiscountPolicyParams(amount, percent.getValue()));
+        return creator.apply(new DiscountPolicyParams(coupon.getAmount(), coupon.getDiscountRate()));
     }
 
-    public record DiscountPolicyParams(Money amount, Double percent) {}
+    public record DiscountPolicyParams(Money amount, Percent percent) {}
 }

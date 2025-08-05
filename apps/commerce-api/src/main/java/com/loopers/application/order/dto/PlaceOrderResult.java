@@ -1,5 +1,6 @@
 package com.loopers.application.order.dto;
 
+import com.loopers.domain.order.Order;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,7 +17,7 @@ public class PlaceOrderResult {
         this.message = message;
     }
 
-    public static PlaceOrderResult SUCCESS() {
+    public static PlaceOrderResult SUCCESS(Order order) {
         return PlaceOrderResult.builder()
                 .status(Status.SUCCESS)
                 .message("")

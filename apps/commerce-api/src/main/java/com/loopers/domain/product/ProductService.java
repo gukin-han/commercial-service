@@ -3,6 +3,7 @@ package com.loopers.domain.product;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    @Transactional
     public List<Product> getAllByIdsIn(List<ProductId> productIds) {
         List<Product> products = productRepository.findAllByIds(productIds.stream()
                 .map(ProductId::getValue)

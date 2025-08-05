@@ -2,13 +2,12 @@ package com.loopers.domain.product;
 
 import jakarta.persistence.Embeddable;
 import java.math.BigDecimal;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 @Getter
 @Embeddable
+@EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Money {
 
@@ -50,4 +49,14 @@ public class Money {
     public Money multiply(double multiplicand) {
         return new Money(this.value.multiply(BigDecimal.valueOf(multiplicand)));
     }
+
+    public boolean isLessThan(Money other) {
+        return this.value.compareTo(other.value) < 0;
+    }
+
+    public boolean isGreaterThanOrEqual(Money other) {
+        return this.value.compareTo(other.value) >= 0;
+    }
+
+    public static final Money ZERO = Money.of(0L);
 }
