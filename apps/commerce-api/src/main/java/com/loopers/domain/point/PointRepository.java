@@ -1,5 +1,7 @@
 package com.loopers.domain.point;
 
+import com.loopers.domain.user.UserId;
+
 import java.util.Optional;
 
 public interface PointRepository {
@@ -8,5 +10,5 @@ public interface PointRepository {
 
     Point save(Point point);
 
-    Optional<Point> findByUserId(Long value);
+    Optional<Point> findByUserId(UserId userId);
 }

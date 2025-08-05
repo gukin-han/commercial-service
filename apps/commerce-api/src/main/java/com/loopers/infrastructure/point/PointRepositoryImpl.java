@@ -5,6 +5,7 @@ import com.loopers.domain.point.PointRepository;
 
 import java.util.Optional;
 
+import com.loopers.domain.user.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,7 @@ public class PointRepositoryImpl implements PointRepository {
     }
 
     @Override
-    public Optional<Point> findByUserId(Long userId) {
+    public Optional<Point> findByUserId(UserId userId) {
         return pointJpaRepository.findByUserId(userId);
     }
 }

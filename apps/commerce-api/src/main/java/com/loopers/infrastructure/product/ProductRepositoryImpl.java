@@ -50,6 +50,11 @@ public class ProductRepositoryImpl implements ProductRepository {
         return productJpaRepository.count();
     }
 
+    @Override
+    public List<Product> saveAll(List<Product> products) {
+        return productJpaRepository.saveAll(products);
+    }
+
     private OrderSpecifier<?> productSort(ProductSortType productSortType) {
         return switch (productSortType) {
             case LATEST -> product.createdAt.desc();

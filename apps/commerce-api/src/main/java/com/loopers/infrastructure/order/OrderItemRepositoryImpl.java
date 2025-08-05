@@ -1,5 +1,6 @@
 package com.loopers.infrastructure.order;
 
+import com.loopers.domain.order.OrderId;
 import com.loopers.domain.order.OrderItem;
 import com.loopers.domain.order.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +17,10 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
     @Override
     public void saveAll(List<OrderItem> orderItems) {
         orderItemJpaRepository.saveAll(orderItems);
+    }
+
+    @Override
+    public List<OrderItem> findOrderItemsByOrderId(OrderId orderId) {
+        return orderItemJpaRepository.findAllByOrderId(orderId);
     }
 }

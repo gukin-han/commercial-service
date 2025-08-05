@@ -16,4 +16,6 @@ public interface ProductRepository {
     Product save(Product product);
 
     long getTotalCount();
+
+    List<Product> saveAll(List<Product> products);
 }

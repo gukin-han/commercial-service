@@ -19,11 +19,11 @@ public class PointService {
     }
 
     public void initializePoints(User user) {
-        pointRepository.save(new Point(Money.ZERO, user.getLoginId()));
+        pointRepository.save(Point.create(user, Money.ZERO));
     }
 
     public Point findByUserId(UserId userId) {
-        return pointRepository.findByUserId(userId.getValue()).orElseThrow(EntityNotFoundException::new);
+        return pointRepository.findByUserId(userId).orElseThrow(EntityNotFoundException::new);
     }
 
     public void deductPoint(Point point, Money amount) {

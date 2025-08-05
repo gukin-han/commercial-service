@@ -20,8 +20,7 @@ public class OrderService {
 
     @Transactional
     public Order create(User user, Map<ProductId, Stock> productIdToStockMap, Money totalPrice, Money discountAmount) {
-        Order order = Order.of(user.getUserId(), totalPrice, discountAmount, OrderStatus.PAID);
-        orderRepository.save(order);
+        Order order = orderRepository.save(Order.of(user.getUserId(), totalPrice, discountAmount, OrderStatus.PAID));
 
         List<OrderItem> orderItems = productIdToStockMap.entrySet().stream()
                 .map(entry -> OrderItem.of(order.getOrderId(), entry.getKey(), entry.getValue().getQuantity()))
