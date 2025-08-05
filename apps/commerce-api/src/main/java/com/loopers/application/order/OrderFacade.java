@@ -42,11 +42,11 @@ public class OrderFacade {
 
         // 3. 상품 재고 차감
         productService.deductStocks(products, productIdToStockMap);
-        long totalPrice = productService.calculateTotalPrice(products, productIdToStockMap);
+        Money totalPrice = productService.calculateTotalPrice(products, productIdToStockMap);
 
         // 4. 포인트 차감
         Point point = pointService.findByUserId(user.getUserId());
-        pointService.deductPoint(point, totalPrice);
+        pointService.deductPoint(point, totalPrice.getValue().longValue());
 
         // 5. 주문 생성
         Order order = orderService.create(user, productIdToStockMap, totalPrice);

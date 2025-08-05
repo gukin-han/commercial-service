@@ -26,36 +26,52 @@ public class Coupon extends BaseEntity {
     @Embedded
     private Money amount;
 
-    private Double percent;
+    @Embedded
+    private Percent discountRate;
 
     private ZonedDateTime usedAt;
 
     @Builder
-    private Coupon(CouponType type, UserId userId, Money amount, Double percent) {
+    private Coupon(CouponType type, UserId userId, Money amount, Percent discountRate) {
         if (type == null || userId == null) {
             throw new IllegalArgumentException("쿠폰 타입과 유저아이디는 필수 입력값입니다.");
         }
 
-        if (CouponType.FIXED_AMOUNT.equals(type) && amount == null) {
-            throw new IllegalArgumentException("정액 쿠폰은 할인금액이 필수 입니다.");
+        if (CouponType.FIXED_AMOUNT.equals(type)) {
+            this.validateFixedTypeCoupon(amount);
         }
 
-        if (CouponType.PERCENTAGE.equals(type) && (percent == null || percent <= 0)) {
-            throw new IllegalArgumentException("정률 쿠폰은 할인율이 필수 입니다..");
+        if (CouponType.PERCENTAGE.equals(type)) {
+            this.validatePercentageCoupon(discountRate);
         }
 
         this.type = type;
         this.userId = userId;
         this.amount = amount;
-        this.percent = percent;
+        this.discountRate = discountRate;
     }
 
-    public static Coupon create(CouponType type, UserId userId, Money amount, Double percent) {
+    private void validatePercentageCoupon(Percent discountRate) {
+        if (discountRate == null) {
+            throw new IllegalArgumentException("정률 쿠폰은 할인율이 필수 입니다.");
+        }
+    }
+
+    private void validateFixedTypeCoupon(Money amount) {
+        if (amount == null) {
+            throw new IllegalArgumentException("정액 쿠폰은 할인금액이 필수 입니다.");
+        }
+        if (!amount.isPositive()) {
+            throw new IllegalArgumentException("할인금액은 양수여야 합니다.");
+        }
+    }
+
+    public static Coupon create(CouponType type, UserId userId, Money amount, Percent discountRate) {
         return Coupon.builder()
                 .type(type)
                 .userId(userId)
                 .amount(amount)
-                .percent(percent)
+                .discountRate(discountRate)
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package com.loopers.domain.product;
 
 import jakarta.persistence.Embeddable;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,19 +12,42 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Money {
 
-    private Long value;
+    private BigDecimal value;
 
     @Builder
-    private Money (long value){
-        if (value < 0) {
-            throw new IllegalArgumentException("금액은 음수일 수 없습니다.");
-        }
+    private Money(BigDecimal value) {
         this.value = value;
+    }
+
+    public static Money of(BigDecimal value) {
+        return Money.builder()
+            .value(value)
+            .build();
     }
 
     public static Money of(long value) {
         return Money.builder()
-                .value(value)
-                .build();
+            .value(BigDecimal.valueOf(value))
+            .build();
+    }
+
+    public boolean isNegative() {
+        return this.value.compareTo(BigDecimal.ZERO) < 0;
+    }
+
+    public boolean isPositive() {
+        return this.value.compareTo(BigDecimal.ZERO) > 0;
+    }
+
+    public Money add(Money money) {
+        return new Money(this.value.add(money.getValue()));
+    }
+
+    public Money subtract(Money money) {
+        return new Money(this.value.subtract(money.getValue()));
+    }
+
+    public Money multiply(double multiplicand) {
+        return new Money(this.value.multiply(BigDecimal.valueOf(multiplicand)));
     }
 }

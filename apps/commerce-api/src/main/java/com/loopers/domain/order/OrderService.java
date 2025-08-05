@@ -17,8 +17,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
-    public Order create(User user, Map<ProductId, Stock> productIdToStockMap, long totalPrice) {
-        Order order = Order.of(user.getUserId(), Money.of(totalPrice), OrderStatus.PAID);
+    public Order create(User user, Map<ProductId, Stock> productIdToStockMap, Money totalPrice) {
+        Order order = Order.of(user.getUserId(), totalPrice, OrderStatus.PAID);
         orderRepository.save(order);
 
         List<OrderItem> orderItems = productIdToStockMap.entrySet().stream()

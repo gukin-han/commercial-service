@@ -50,12 +50,12 @@ public class ProductService {
         product.decreaseStock(stock.getQuantity());
     }
 
-    public long calculateTotalPrice(List<Product> products, Map<ProductId, Stock> productIdToStockMap) {
-        long totalPrice = 0;
+    public Money calculateTotalPrice(List<Product> products, Map<ProductId, Stock> productIdToStockMap) {
+        Money totalPrice = Money.of(0L);
         for (Product product : products) {
             Money unitPrice = product.getPrice();
-            Stock stock = productIdToStockMap.get(product);
-            totalPrice += stock.getQuantity() + unitPrice.getValue();
+            Stock stock = productIdToStockMap.get(product.getProductId());
+            totalPrice = totalPrice.add(unitPrice.multiply(stock.getQuantity()));
         }
         return totalPrice;
     }
