@@ -1,5 +1,6 @@
 package com.loopers.domain.point;
 
+import com.loopers.domain.product.Money;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserId;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,14 +19,14 @@ public class PointService {
     }
 
     public void initializePoints(User user) {
-        pointRepository.save(new Point(0, user.getLoginId()));
+        pointRepository.save(new Point(Money.ZERO, user.getLoginId()));
     }
 
     public Point findByUserId(UserId userId) {
         return pointRepository.findByUserId(userId.getValue()).orElseThrow(EntityNotFoundException::new);
     }
 
-    public void deductPoint(Point point, Long amount) {
+    public void deductPoint(Point point, Money amount) {
         point.deduct(amount);
     }
 

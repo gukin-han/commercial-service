@@ -40,7 +40,7 @@ public class PointV1Controller implements PointV1ApiSpec {
             @RequestHeader("X-USER-ID") String userId, @RequestBody PointV1Dto.ChargeRequest request) {
 
         PointCharge pointCharge = request.toVo();
-        Point chargedPoint = pointFacade.chargePoint(userId, pointCharge);
+        Point chargedPoint = pointFacade.chargePoint(userId, pointCharge.getAmount());
 
         return ApiResponse.success(PointV1Dto.PointResponse.fromEntity(chargedPoint));
     }

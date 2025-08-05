@@ -3,6 +3,7 @@ package com.loopers.interfaces.api.point;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.loopers.domain.product.Money;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.point.PointV1Dto.PointResponse;
 import com.loopers.interfaces.api.user.UserV1Dto;
@@ -21,6 +22,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+
+import java.math.BigDecimal;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PointV1ControllerTest {
@@ -74,7 +77,7 @@ class PointV1ControllerTest {
             //then
             assertAll(
                     () -> assertTrue(result.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(result.getBody().data().balance()).isEqualTo(0L) // 초기 포인트는 0으로 설정되어 있다고 가정합니다.
+                    () -> assertThat(result.getBody().data().balance().getValue().compareTo(BigDecimal.ZERO)).isEqualTo(0) // 초기 포인트는 0으로 설정되어 있다고 가정합니다.
             );
         }
 
@@ -141,8 +144,8 @@ class PointV1ControllerTest {
 
             //then
             Assertions.assertAll(
-                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().balance()).isEqualTo(1000L) // 충전 후 보유 포인트가 1000으로 설정되어 있다고 가정합니다.
+                    () -> assertThat(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().balance().getValue().compareTo(BigDecimal.valueOf(1000L))).isEqualTo(0) // 충전 후 보유 포인트가 1000으로 설정되어 있다고 가정합니다.
             );
         }
 
