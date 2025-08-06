@@ -35,6 +35,9 @@ public class Coupon extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private CouponStatus status;
 
+    @Version
+    private Long version;
+
     @Builder
     private Coupon(CouponType type, UserId userId, Money amount, Percent discountRate, CouponStatus status) {
         if (type == null || userId == null) {
@@ -91,6 +94,10 @@ public class Coupon extends BaseEntity {
     public void cancelUse() {
         this.orderId = null;
         this.status = CouponStatus.AVAILABLE;
+    }
+
+    public boolean isUsed() {
+        return this.orderId != null;
     }
 
 }

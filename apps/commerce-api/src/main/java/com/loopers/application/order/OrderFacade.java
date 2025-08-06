@@ -37,32 +37,38 @@ public class OrderFacade {
 
     @Transactional
     public PlaceOrderResult placeOrder(PlaceOrderCommand command) {
-        Cart cart = command.getCart();
-        Map<ProductId, Stock> productIdToStockMap = this.getProductIdStockMap(cart);
+        Map<ProductId, Stock> productIdToStockMap = this.getProductIdStockMap(command.getCart());
 
         // 1. 사용자 정보 조회
         User user = userService.findByUserId(UserId.of(command.getUserId()));
 
-        // 2. 상품 조회
+        // 2. 상품 재고 차감
         List<Product> products = productService.getAllByIdsIn(productIdToStockMap.keySet().stream().toList());
-
-        // 3. 상품 재고 차감
         productService.deductStocks(products, productIdToStockMap);
-        Money totalPrice = productService.calculateTotalPrice(products, productIdToStockMap);
 
-        // 4. 쿠폰 조회
-        Coupon coupon = couponQueryService.getCouponByCouponIdAndUserId(CouponId.of(command.getCouponId()), user.getUserId());
-        CouponDiscountCalculator calculator = new CouponDiscountCalculator();
-        Money discountAmount = calculator.calculateDiscountAmount(coupon, totalPrice);
+        // 3. 쿠폰 적용 및 할인 계산
+        Money totalPrice = productService.calculateTotalPrice(products, productIdToStockMap);
+        Money discountAmount = Money.ZERO;
+        Coupon coupon = null;
+        if (command.getCouponId() != null) {
+            coupon = couponQueryService.getCouponByCouponIdAndUserId(CouponId.of(command.getCouponId()), user.getUserId());
+            CouponDiscountCalculator calculator = new CouponDiscountCalculator();
+            discountAmount = calculator.calculateDiscountAmount(coupon, totalPrice);
+        }
+
+        // 4. 주문 생성
+        Order order = orderService.create(user, productIdToStockMap, totalPrice, discountAmount);
 
         // 5. 포인트 차감
         Point point = pointService.findByUserId(user.getUserId());
         pointService.deductPoint(point, totalPrice.subtract(discountAmount));
 
-        // 6. 주문 생성
-        Order order = orderService.create(user, productIdToStockMap, totalPrice, discountAmount);
-        coupon.use(order);
-        couponRepository.save(coupon);
+        // 6. 쿠폰 사용처리
+        if (coupon != null) {
+            coupon.use(order);
+            couponRepository.save(coupon);
+        }
+
         return PlaceOrderResult.SUCCESS(order);
     }
 
