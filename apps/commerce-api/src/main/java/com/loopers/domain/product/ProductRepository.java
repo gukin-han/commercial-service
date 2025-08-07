@@ -4,7 +4,6 @@ import com.loopers.application.product.dto.ProductSortType;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface ProductRepository {
     Optional<Product> findById(Long productId);
@@ -18,4 +17,6 @@ public interface ProductRepository {
     long getTotalCount();
 
     List<Product> saveAll(List<Product> products);
+
+    List<Product> findAllByIdsWithPessimisticLock(List<Long> productIds);
 }

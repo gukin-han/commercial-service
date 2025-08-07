@@ -1,10 +1,9 @@
-package com.loopers.application.coupon;
+package com.loopers.domain.coupon;
 
 import com.loopers.domain.coupon.Coupon;
 import com.loopers.domain.coupon.CouponId;
 import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.user.UserId;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class CouponQueryService {
+public class CouponService {
 
     private final CouponRepository couponRepository;
 

@@ -28,6 +28,11 @@ public class FakeProductRepository extends FakeJpaRepository<Product> implements
     }
 
     @Override
+    public List<Product> findAllByIdsWithPessimisticLock(List<Long> productIds) {
+        return null;
+    }
+
+    @Override
     public Optional<Product> findById(Long productId) {
         return data.stream()
                 .filter(p -> p.getId() != null && p.getId().equals(productId))

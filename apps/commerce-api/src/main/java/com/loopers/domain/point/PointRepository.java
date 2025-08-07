@@ -10,5 +10,7 @@ public interface PointRepository {
 
     Point save(Point point);
 
+    Optional<Point> findByUserIdForUpdate(UserId userId);
+
     Optional<Point> findByUserId(UserId userId);
 }

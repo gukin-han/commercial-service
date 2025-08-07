@@ -1,6 +1,6 @@
 package com.loopers.application.order;
 
-import com.loopers.application.coupon.CouponQueryService;
+import com.loopers.domain.coupon.CouponService;
 import com.loopers.application.order.dto.Cart;
 import com.loopers.application.order.dto.PlaceOrderCommand;
 import com.loopers.application.order.dto.PlaceOrderResult;
@@ -11,6 +11,7 @@ import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.point.Point;
+import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.point.PointService;
 import com.loopers.domain.product.*;
 import com.loopers.domain.user.User;
@@ -32,8 +33,9 @@ public class OrderFacade {
     private final UserService userService;
     private final PointService pointService;
     private final OrderService orderService;
-    private final CouponQueryService couponQueryService;
+    private final CouponService couponService;
     private final CouponRepository couponRepository;
+    private final PointRepository pointRepository;
 
     @Transactional
     public PlaceOrderResult placeOrder(PlaceOrderCommand command) {
@@ -51,7 +53,7 @@ public class OrderFacade {
         Money discountAmount = Money.ZERO;
         Coupon coupon = null;
         if (command.getCouponId() != null) {
-            coupon = couponQueryService.getCouponByCouponIdAndUserId(CouponId.of(command.getCouponId()), user.getUserId());
+            coupon = couponService.getCouponByCouponIdAndUserId(CouponId.of(command.getCouponId()), user.getUserId());
             CouponDiscountCalculator calculator = new CouponDiscountCalculator();
             discountAmount = calculator.calculateDiscountAmount(coupon, totalPrice);
         }
@@ -61,7 +63,8 @@ public class OrderFacade {
 
         // 5. 포인트 차감
         Point point = pointService.findByUserId(user.getUserId());
-        pointService.deductPoint(point, totalPrice.subtract(discountAmount));
+        point.deduct(totalPrice.subtract(discountAmount));
+        pointRepository.save(point);
 
         // 6. 쿠폰 사용처리
         if (coupon != null) {

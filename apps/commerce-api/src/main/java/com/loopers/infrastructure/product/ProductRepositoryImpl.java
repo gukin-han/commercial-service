@@ -55,6 +55,11 @@ public class ProductRepositoryImpl implements ProductRepository {
         return productJpaRepository.saveAll(products);
     }
 
+    @Override
+    public List<Product> findAllByIdsWithPessimisticLock(List<Long> productIds) {
+        return productJpaRepository.findAllForUpdate(productIds);
+    }
+
     private OrderSpecifier<?> productSort(ProductSortType productSortType) {
         return switch (productSortType) {
             case LATEST -> product.createdAt.desc();

@@ -51,7 +51,7 @@ spring.config.activate.on-profile: test
 
 spring:
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: create
 

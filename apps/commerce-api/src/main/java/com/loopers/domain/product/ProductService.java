@@ -19,20 +19,17 @@ public class ProductService {
         return productRepository.findById(productId.getValue()).orElseThrow(EntityNotFoundException::new);
     }
 
-    public List<Product> findAllByIds(List<ProductId> productIds) {
-        return productRepository.findAllByIds(productIds.stream().map(ProductId::getValue).collect(Collectors.toList()));
-    }
-
     public Product save(Product product) {
         return productRepository.save(product);
     }
 
-    @Transactional
     public List<Product> getAllByIdsIn(List<ProductId> productIds) {
-        List<Product> products = productRepository.findAllByIds(productIds.stream()
+        List<Long> sortedProductIds = productIds.stream()
                 .map(ProductId::getValue)
-                .toList()
-        );
+                .sorted()
+                .toList();
+
+        List<Product> products = productRepository.findAllByIdsWithPessimisticLock(sortedProductIds);
 
         if (products.size() != productIds.size()) {
             throw new IllegalArgumentException("조회결과, 존재하지 않는 상품이 있습니다.");

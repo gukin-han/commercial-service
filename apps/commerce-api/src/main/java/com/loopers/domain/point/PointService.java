@@ -22,8 +22,9 @@ public class PointService {
         pointRepository.save(Point.create(user, Money.ZERO));
     }
 
+    @Transactional
     public Point findByUserId(UserId userId) {
-        return pointRepository.findByUserId(userId).orElseThrow(EntityNotFoundException::new);
+        return pointRepository.findByUserIdForUpdate(userId).orElseThrow(EntityNotFoundException::new);
     }
 
     public void deductPoint(Point point, Money amount) {
