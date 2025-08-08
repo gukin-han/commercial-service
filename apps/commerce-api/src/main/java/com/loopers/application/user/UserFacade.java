@@ -19,14 +19,13 @@ public class UserFacade {
 
     public User signUp(User user) {
         User signedUpUser = userService.signUp(user);
-
         pointService.initializePoints(signedUpUser);
 
         return signedUpUser;
     }
 
     @Transactional(readOnly = true)
-    public User getMe(String userId) {
+    public User getUserByLoginId(String userId) {
         User me = userService.getMe(userId);
         if (me == null) {
             throw new CoreException(ErrorType.NOT_FOUND, "사용자를 찾을 수 없습니다.");

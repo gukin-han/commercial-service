@@ -3,7 +3,7 @@ package com.loopers.interfaces.api.point;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.loopers.domain.product.Money;
+import com.loopers.interfaces.api.ApiHeader;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.point.PointV1Dto.PointResponse;
 import com.loopers.interfaces.api.user.UserV1Dto;
@@ -42,9 +42,6 @@ class PointV1ControllerTest {
         this.databaseCleanUp = databaseCleanUp;
     }
 
-    /**
-     * - [ ]  포인트 조회에 성공할 경우, 보유 포인트를 응답으로 반환한다. - [ ]  `X-USER-ID` 헤더가 없을 경우, `400 Bad Request` 응답을 반환한다.
-     */
     @DisplayName("GET /api/v1/points")
     @Nested
     class GetPointByUserId {
@@ -53,26 +50,26 @@ class PointV1ControllerTest {
         @DisplayName("포인트 조회에 성공할 경우, 보유 포인트를 응답으로 반환한다.")
         void returnsPoint_whenGetPointSuccessfully() {
             //given
-            // 1. 먼저 회원 가입을 수행하여 유저를 생성합니다.
-            UserV1Dto.RegisterRequest registerRequest = new UserV1Dto.RegisterRequest("gukin@gmail.com", "gukin", "2025-07-15", Gender.FEMALE);
+            UserV1Dto.SignUpRequest signUpRequest = createSignUpRequest();
             HttpHeaders registerHeaders = new HttpHeaders();
-            ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>> registerResponseType = new ParameterizedTypeReference<>() {
-            };
             testRestTemplate.exchange(
-                    "/api/v1/users", HttpMethod.POST, new HttpEntity<>(registerRequest, registerHeaders), registerResponseType);
+                    "/api/v1/users",
+                    HttpMethod.POST,
+                    new HttpEntity<>(signUpRequest, registerHeaders),
+                    new ParameterizedTypeReference<>() {
+                    }
+            );
 
-            // 2. 이후 포인트 조회를 수행합니다.
             HttpHeaders getPointHeaders = new HttpHeaders();
             getPointHeaders.set("X-USER-ID", "gukin");
-            ParameterizedTypeReference<ApiResponse<PointResponse>> responseType = new ParameterizedTypeReference<>() {
-            };
 
             //when
             ResponseEntity<ApiResponse<PointResponse>> result = testRestTemplate.exchange(
                     "/api/v1/points",
                     HttpMethod.GET,
                     new HttpEntity<>(null, getPointHeaders),
-                    responseType);
+                    new ParameterizedTypeReference<>() {}
+            );
 
             //then
             assertAll(
@@ -118,34 +115,34 @@ class PointV1ControllerTest {
         void returnsChargedPoint_whenExistingUserChargePoint() {
             //given
             HttpHeaders headerWithUserId = new HttpHeaders();
-            headerWithUserId.set("X-USER-ID", "gukin");
+            headerWithUserId.set(ApiHeader.LOGIN_ID, "gukin");
 
             // 1. 먼저 회원 가입을 수행하여 유저를 생성합니다.
-            UserV1Dto.RegisterRequest registerRequest = new UserV1Dto.RegisterRequest("gukin@gmail.com", "gukin", "2025-07-15", Gender.FEMALE);
-            ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>> registerResponseType = new ParameterizedTypeReference<>() {
-            };
+            UserV1Dto.SignUpRequest signUpRequest = createSignUpRequest();
             testRestTemplate.exchange(
                     "/api/v1/users",
                     HttpMethod.POST,
-                    new HttpEntity<>(registerRequest, null),
-                    registerResponseType);
+                    new HttpEntity<>(signUpRequest, null),
+                    new ParameterizedTypeReference<>() {
+                    }
+            );
 
             // 2. 이후 포인트 충전을 수행합니다.
-            PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(1000L); // 충전 후 보유 포인트가 1000으로 설정되어 있다고 가정합니다.
-            ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResponse>> chargeResponseType = new ParameterizedTypeReference<>() {
-            };
+            PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(1000L);
 
             //when
             ResponseEntity<ApiResponse<PointResponse>> response = testRestTemplate.exchange(
                     "/api/v1/points/charge",
                     HttpMethod.POST,
                     new HttpEntity<>(chargeRequest, headerWithUserId),
-                    chargeResponseType);
+                    new ParameterizedTypeReference<>() {
+                    }
+            );
 
             //then
             Assertions.assertAll(
-                    () -> assertThat(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().balance().getValue().compareTo(BigDecimal.valueOf(1000L))).isEqualTo(0) // 충전 후 보유 포인트가 1000으로 설정되어 있다고 가정합니다.
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().balance().getValue().compareTo(BigDecimal.valueOf(1000L))).isEqualTo(0)
             );
         }
 
@@ -155,17 +152,17 @@ class PointV1ControllerTest {
             //given
             // 존재하지 않는 유저로 포인트 충전을 수행합니다.
             HttpHeaders headerWithUserId = new HttpHeaders();
-            headerWithUserId.set("X-USER-ID", "gukin");
+            headerWithUserId.set(ApiHeader.LOGIN_ID, "gukin");
             PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(1000L); // 충전 후 보유 포인트가 1000으로 설정되어 있다고 가정합니다.
-            ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResponse>> chargeResponseType = new ParameterizedTypeReference<>() {
-            };
 
             //when
             ResponseEntity<ApiResponse<PointResponse>> response = testRestTemplate.exchange(
                     "/api/v1/points/charge",
                     HttpMethod.POST,
                     new HttpEntity<>(chargeRequest, headerWithUserId),
-                    chargeResponseType);
+                    new ParameterizedTypeReference<>() {
+                    }
+            );
 
             //then
             Assertions.assertAll(
@@ -173,5 +170,14 @@ class PointV1ControllerTest {
             );
         }
 
+    }
+
+    private static UserV1Dto.SignUpRequest createSignUpRequest() {
+        return UserV1Dto.SignUpRequest.builder()
+                .loginId("gukin")
+                .birthday("2025-07-15")
+                .gender(Gender.FEMALE)
+                .email("gukin@gmail.com")
+                .build();
     }
 }

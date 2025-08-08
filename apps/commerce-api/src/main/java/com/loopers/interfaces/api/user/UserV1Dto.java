@@ -2,24 +2,46 @@ package com.loopers.interfaces.api.user;
 
 import com.loopers.domain.user.User;
 import com.loopers.support.constant.Gender;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 public class UserV1Dto {
 
-    public record UserResponse(String email, String userId, String dateOfBirth) {
+    @Data
+    @Builder
+    @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+    public static class UserResponse {
+
+        private String email;
+        private String loginId;
+        private String dateOfBirth;
 
         public static UserResponse fromEntity(User user) {
-            return new UserResponse(user.getEmail(), user.getLoginId(), user.getDateOfBirth());
+            return UserResponse.builder()
+                    .email(user.getEmail())
+                    .loginId(user.getLoginId())
+                    .dateOfBirth(user.getDateOfBirth())
+                    .build();
         }
     }
 
-    public record RegisterRequest(String email, String loginId, String birthday, Gender gender) {
+    @Data
+    @Builder
+    @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+    public static class SignUpRequest {
 
-        public static User toEntity(RegisterRequest request) {
+        private String email;
+        private String loginId;
+        private String birthday;
+        private Gender gender;
+
+        public User toEntity() {
             return User.builder()
-                    .email(request.email)
-                    .loginId(request.loginId)
-                    .dateOfBirth(request.birthday)
-                    .gender(request.gender)
+                    .email(this.email)
+                    .loginId(this.loginId)
+                    .dateOfBirth(this.birthday)
+                    .gender(this.gender)
                     .build();
         }
     }
