@@ -59,12 +59,11 @@ public class OrderFacade {
         }
 
         // 4. 주문 생성
-        Order order = orderService.create(user, productIdToStockMap, totalPrice, discountAmount);
+        Order order = orderService.create(user.getUserId(), productIdToStockMap, totalPrice, discountAmount);
 
         // 5. 포인트 차감
-        Point point = pointService.findByUserId(user.getUserId());
-        point.deduct(totalPrice.subtract(discountAmount));
-        pointRepository.save(point);
+        pointService.deductPoints(user.getUserId(), totalPrice.subtract(discountAmount));
+
 
         // 6. 쿠폰 사용처리
         if (coupon != null) {

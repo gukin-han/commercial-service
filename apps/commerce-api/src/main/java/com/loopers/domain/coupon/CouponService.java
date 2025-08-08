@@ -18,6 +18,7 @@ public class CouponService {
     public Coupon getCouponByCouponIdAndUserId(CouponId couponId, UserId userId) {
         Coupon coupon = couponRepository.findByIdAndCouponId(couponId, userId)
                 .orElse(null);
+
         if (coupon != null && coupon.isUsed()) {
             throw new IllegalStateException("쿠폰은 한 번만 사용할 수 있습니다.");
         }

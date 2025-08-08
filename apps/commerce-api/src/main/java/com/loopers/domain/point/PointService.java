@@ -14,22 +14,28 @@ public class PointService {
 
     private final PointRepository pointRepository;
 
+    @Transactional
     public Point getPointByUserId(String userId) {
         return pointRepository.findByLoginId(userId).orElse(null);
     }
 
+    @Transactional
     public void initializePoints(User user) {
         pointRepository.save(Point.create(user, Money.ZERO));
     }
 
     @Transactional
     public Point findByUserId(UserId userId) {
-        return pointRepository.findByUserIdForUpdate(userId).orElseThrow(EntityNotFoundException::new);
+        return pointRepository.findByUserIdForUpdate(userId)
+                .orElseThrow(EntityNotFoundException::new);
     }
 
-    public void deductPoint(Point point, Money amount) {
+    @Transactional
+    public void deductPoints(UserId userId, Money amount) {
+        Point point = findByUserId(userId);
         point.deduct(amount);
     }
+
 
     public Point save(Point point) {
         return pointRepository.save(point);
