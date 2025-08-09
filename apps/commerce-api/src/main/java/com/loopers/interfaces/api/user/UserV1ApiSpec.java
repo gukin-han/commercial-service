@@ -17,6 +17,6 @@ public interface UserV1ApiSpec {
             summary = "내 정보 조회",
             description = "로그인 유저의 정보를 조회한다."
     )
-    ApiResponse<UserV1Dto.UserResponse> getUserInfo(String UserId);
+    ApiResponse<UserV1Dto.GetUserInfoResponse> getUserInfo(String loginId);
 
 }

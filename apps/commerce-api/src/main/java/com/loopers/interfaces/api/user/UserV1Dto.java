@@ -2,7 +2,7 @@ package com.loopers.interfaces.api.user;
 
 import com.loopers.application.user.dto.SignUpCommand;
 import com.loopers.application.user.dto.SignUpResult;
-import com.loopers.domain.user.User;
+import com.loopers.application.user.dto.UserInfoView;
 import com.loopers.support.constant.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,17 +13,17 @@ public class UserV1Dto {
     @Data
     @Builder
     @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
-    public static class UserResponse {
+    public static class GetUserInfoResponse {
 
         private String email;
         private String loginId;
         private String dateOfBirth;
 
-        public static UserResponse fromEntity(User user) {
-            return UserResponse.builder()
-                    .email(user.getEmail())
-                    .loginId(user.getLoginId())
-                    .dateOfBirth(user.getDateOfBirth())
+        public static GetUserInfoResponse fromView(UserInfoView view) {
+            return GetUserInfoResponse.builder()
+                    .email(view.getEmail())
+                    .loginId(view.getLoginId())
+                    .dateOfBirth(view.getDateOfBirth())
                     .build();
         }
     }

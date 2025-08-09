@@ -1,8 +1,9 @@
 package com.loopers.interfaces.api.user;
 
 import com.loopers.application.user.UserFacade;
+import com.loopers.application.user.dto.GetUserInfoQuery;
 import com.loopers.application.user.dto.SignUpResult;
-import com.loopers.domain.user.User;
+import com.loopers.application.user.dto.UserInfoView;
 import com.loopers.interfaces.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,11 +34,12 @@ public class UserV1Controller implements UserV1ApiSpec {
 
     @Override
     @GetMapping("/me")
-    public ApiResponse<UserV1Dto.UserResponse> getUserInfo(
+    public ApiResponse<UserV1Dto.GetUserInfoResponse> getUserInfo(
             @RequestHeader(LOGIN_ID) String loginId
     ) {
-        User me = userFacade.getUserInfo(loginId);
+        GetUserInfoQuery query = GetUserInfoQuery.builder().loginId(loginId).build();
+        UserInfoView view = userFacade.getUserInfo(query);
 
-        return ApiResponse.success(UserV1Dto.UserResponse.fromEntity(me));
+        return ApiResponse.success(UserV1Dto.GetUserInfoResponse.fromView(view));
     }
 }

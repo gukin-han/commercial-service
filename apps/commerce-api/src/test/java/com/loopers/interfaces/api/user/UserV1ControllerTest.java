@@ -104,7 +104,7 @@ class UserV1ControllerTest {
 
     @DisplayName("GET /api/v1/users/me")
     @Nested
-    class Get {
+    class GetUserInfo {
         @DisplayName("내 정보 조회에 성공할 경우, 해당하는 유저 정보를 응답으로 반환한다.")
         @Test
         void returnsUserInfo_whenProcessedSuccessfully() {
@@ -128,7 +128,7 @@ class UserV1ControllerTest {
             headers.set(ApiHeader.LOGIN_ID, "gukin");
 
             //when
-            ResponseEntity<ApiResponse<UserV1Dto.SignUpResponse>> response = testRestTemplate.exchange(
+            ResponseEntity<ApiResponse<UserV1Dto.GetUserInfoResponse>> response = testRestTemplate.exchange(
                     "/api/v1/users/me",
                     HttpMethod.GET,
                     new HttpEntity<>(null, headers),
@@ -139,9 +139,10 @@ class UserV1ControllerTest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().getEmail()).isEqualTo("gukin@gmail.com"),
-                    () -> assertThat(response.getBody().data().getLoginId()).isEqualTo("gukin"),
-                    () -> assertThat(response.getBody().data().getDateOfBirth()).isEqualTo("2025-07-15")
+                    () -> assertThat(Objects.requireNonNull(response.getBody()).data()).isNotNull(),
+                    () -> assertThat(Objects.requireNonNull(response.getBody()).data().getEmail()).isEqualTo("gukin@gmail.com"),
+                    () -> assertThat(Objects.requireNonNull(response.getBody()).data().getLoginId()).isEqualTo("gukin"),
+                    () -> assertThat(Objects.requireNonNull(response.getBody()).data().getDateOfBirth()).isEqualTo("2025-07-15")
             );
         }
 
@@ -153,7 +154,7 @@ class UserV1ControllerTest {
             headers.set(ApiHeader.LOGIN_ID, "notExisting");
 
             //when
-            ResponseEntity<ApiResponse<UserV1Dto.SignUpResponse>> response = testRestTemplate.exchange(
+            ResponseEntity<ApiResponse<UserV1Dto.GetUserInfoResponse>> response = testRestTemplate.exchange(
                     "/api/v1/users/me",
                     HttpMethod.GET,
                     new HttpEntity<>(null, headers),
