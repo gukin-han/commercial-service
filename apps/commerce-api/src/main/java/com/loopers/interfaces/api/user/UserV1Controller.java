@@ -1,6 +1,7 @@
 package com.loopers.interfaces.api.user;
 
 import com.loopers.application.user.UserFacade;
+import com.loopers.application.user.dto.SignUpResult;
 import com.loopers.domain.user.User;
 import com.loopers.interfaces.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,20 +23,20 @@ public class UserV1Controller implements UserV1ApiSpec {
 
     @Override
     @PostMapping
-    public ApiResponse<UserV1Dto.UserResponse> signUp(
+    public ApiResponse<UserV1Dto.SignUpResponse> signUp(
             @RequestBody UserV1Dto.SignUpRequest request
     ) {
-        User user = userFacade.signUp(request.toEntity());
+        SignUpResult result = userFacade.signUp(request.toCommand());
 
-        return ApiResponse.success(UserV1Dto.UserResponse.fromEntity(user));
+        return ApiResponse.success(UserV1Dto.SignUpResponse.fromResult(result));
     }
 
     @Override
     @GetMapping("/me")
-    public ApiResponse<UserV1Dto.UserResponse> getMe(
+    public ApiResponse<UserV1Dto.UserResponse> getUserInfo(
             @RequestHeader(LOGIN_ID) String loginId
     ) {
-        User me = userFacade.getUserByLoginId(loginId);
+        User me = userFacade.getUserInfo(loginId);
 
         return ApiResponse.success(UserV1Dto.UserResponse.fromEntity(me));
     }

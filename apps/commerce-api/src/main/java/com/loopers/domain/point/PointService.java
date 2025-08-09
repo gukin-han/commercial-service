@@ -20,8 +20,8 @@ public class PointService {
     }
 
     @Transactional
-    public void initializePoints(User user) {
-        pointRepository.save(Point.create(user, Money.ZERO));
+    public Point initializePoints(User user) {
+        return pointRepository.save(Point.create(user, Money.ZERO));
     }
 
     @Transactional

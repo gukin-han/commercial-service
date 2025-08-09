@@ -175,7 +175,7 @@ class PointV1ControllerTest {
     private static UserV1Dto.SignUpRequest createSignUpRequest() {
         return UserV1Dto.SignUpRequest.builder()
                 .loginId("gukin")
-                .birthday("2025-07-15")
+                .dateOfBirth("2025-07-15")
                 .gender(Gender.FEMALE)
                 .email("gukin@gmail.com")
                 .build();

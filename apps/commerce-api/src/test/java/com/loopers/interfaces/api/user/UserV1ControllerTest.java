@@ -27,27 +27,28 @@ class UserV1ControllerTest {
     private final TestRestTemplate testRestTemplate;
     private final DatabaseCleanUp databaseCleanUp;
 
-    @AfterEach
-    void tearDown() {
-        databaseCleanUp.truncateAllTables();
-    }
-
     @Autowired
     public UserV1ControllerTest(TestRestTemplate testRestTemplate, DatabaseCleanUp databaseCleanUp) {
         this.testRestTemplate = testRestTemplate;
         this.databaseCleanUp = databaseCleanUp;
     }
 
+    @AfterEach
+    void tearDown() {
+        databaseCleanUp.truncateAllTables();
+    }
+
     @DisplayName("POST /api/v1/users")
     @Nested
-    class register {
+    class SignUp {
+
         @DisplayName("회원 가입이 성공할 경우, 생성된 유저 정보를 응답으로 반환한다.")
         @Test
         void returnsUserInfo_whenUserSuccessfullySignUp() {
             //given
             UserV1Dto.SignUpRequest request = UserV1Dto.SignUpRequest.builder()
                     .loginId("gukin")
-                    .birthday("2025-07-15")
+                    .dateOfBirth("2025-07-15")
                     .gender(Gender.FEMALE)
                     .email("gukin@gmail.com")
                     .build();
@@ -55,7 +56,7 @@ class UserV1ControllerTest {
             HttpHeaders headers = new HttpHeaders();
 
             //when
-            ResponseEntity<ApiResponse<UserV1Dto.UserResponse>> response = testRestTemplate.exchange(
+            ResponseEntity<ApiResponse<UserV1Dto.SignUpResponse>> response = testRestTemplate.exchange(
                     "/api/v1/users",
                     HttpMethod.POST,
                     new HttpEntity<>(request, headers),
@@ -77,7 +78,7 @@ class UserV1ControllerTest {
             //given
             UserV1Dto.SignUpRequest request = UserV1Dto.SignUpRequest.builder()
                     .loginId("gukin")
-                    .birthday("2025-07-15")
+                    .dateOfBirth("2025-07-15")
                     .gender(null)
                     .email("gukin@gmail.com")
                     .build();
@@ -85,7 +86,7 @@ class UserV1ControllerTest {
             HttpHeaders headers = new HttpHeaders();
 
             //when
-            ResponseEntity<ApiResponse<UserV1Dto.UserResponse>> response = testRestTemplate.exchange(
+            ResponseEntity<ApiResponse<UserV1Dto.SignUpResponse>> response = testRestTemplate.exchange(
                     "/api/v1/users",
                     HttpMethod.POST,
                     new HttpEntity<>(request, headers),
@@ -110,7 +111,7 @@ class UserV1ControllerTest {
             //given
             UserV1Dto.SignUpRequest request = UserV1Dto.SignUpRequest.builder()
                     .loginId("gukin")
-                    .birthday("2025-07-15")
+                    .dateOfBirth("2025-07-15")
                     .gender(Gender.FEMALE)
                     .email("gukin@gmail.com")
                     .build();
@@ -127,7 +128,7 @@ class UserV1ControllerTest {
             headers.set(ApiHeader.LOGIN_ID, "gukin");
 
             //when
-            ResponseEntity<ApiResponse<UserV1Dto.UserResponse>> response = testRestTemplate.exchange(
+            ResponseEntity<ApiResponse<UserV1Dto.SignUpResponse>> response = testRestTemplate.exchange(
                     "/api/v1/users/me",
                     HttpMethod.GET,
                     new HttpEntity<>(null, headers),
@@ -152,7 +153,7 @@ class UserV1ControllerTest {
             headers.set(ApiHeader.LOGIN_ID, "notExisting");
 
             //when
-            ResponseEntity<ApiResponse<UserV1Dto.UserResponse>> response = testRestTemplate.exchange(
+            ResponseEntity<ApiResponse<UserV1Dto.SignUpResponse>> response = testRestTemplate.exchange(
                     "/api/v1/users/me",
                     HttpMethod.GET,
                     new HttpEntity<>(null, headers),
