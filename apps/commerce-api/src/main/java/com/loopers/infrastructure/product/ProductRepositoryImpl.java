@@ -33,7 +33,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     public List<Product> findProducts(int page, int size, ProductSortType productSortType) {
         return jpaQueryFactory.selectFrom(product)
                 .orderBy(productSort(productSortType))
-                .offset((long) (page - 1) * size)
+                .offset((long) page * size)
                 .limit(size)
                 .fetch();
     }

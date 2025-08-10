@@ -1,5 +1,7 @@
 package com.loopers.domain.product;
 
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,7 +18,8 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     public Product findByProductId(ProductId productId) {
-        return productRepository.findById(productId.getValue()).orElseThrow(EntityNotFoundException::new);
+        return productRepository.findById(productId.getValue())
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "조회할 수 없는 상품입니다."));
     }
 
     public Product save(Product product) {

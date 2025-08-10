@@ -22,8 +22,8 @@ public class UserV1Controller implements UserV1ApiSpec {
 
     private final UserFacade userFacade;
 
-    @Override
     @PostMapping
+    @Override
     public ApiResponse<UserV1Dto.SignUpResponse> signUp(
             @RequestBody UserV1Dto.SignUpRequest request
     ) {
@@ -32,8 +32,8 @@ public class UserV1Controller implements UserV1ApiSpec {
         return ApiResponse.success(UserV1Dto.SignUpResponse.fromResult(result));
     }
 
-    @Override
     @GetMapping("/me")
+    @Override
     public ApiResponse<UserV1Dto.GetUserInfoResponse> getUserInfo(
             @RequestHeader(LOGIN_ID) String loginId
     ) {

@@ -12,7 +12,9 @@ public interface UserV1ApiSpec {
             summary = "회원가입",
             description = "유저의 새로운 계정을 생성한다."
     )
-    ApiResponse<UserV1Dto.SignUpResponse> signUp(UserV1Dto.SignUpRequest request);
+    ApiResponse<UserV1Dto.SignUpResponse> signUp(
+            UserV1Dto.SignUpRequest request
+    );
 
     @Operation(
             summary = "내 정보 조회",
@@ -22,5 +24,4 @@ public interface UserV1ApiSpec {
             @Schema(name = "X-USER-ID", description = "로그인 유저의 ID")
             String loginId
     );
-
 }

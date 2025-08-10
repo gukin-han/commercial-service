@@ -52,7 +52,7 @@ class ProductFacadeTest {
                     .build();
             Product savedProduct = productRepository.save(product);
 
-            ProductDetailQuery query = ProductDetailQuery.of(savedProduct.getId(), savedBrand.getId());
+            ProductDetailQuery query = ProductDetailQuery.of(savedProduct.getId());
 
             // When
             ProductDetailView detailView = productFacade.getProductDetail(query);
@@ -92,9 +92,9 @@ class ProductFacadeTest {
                 productRepository.save(product);
             }
 
-            // 1페이지, 사이즈 5, 최신순 정렬 쿼리
-            ProductPageQuery query = ProductPageQuery.create(1, 5, ProductSortType.LATEST);
-            ProductPageQuery query2 = ProductPageQuery.create(2, 5, ProductSortType.LATEST);
+            // 0페이지, 사이즈 5, 최신순 정렬 쿼리
+            ProductPageQuery query = ProductPageQuery.create(0, 5, ProductSortType.LATEST);
+            ProductPageQuery query2 = ProductPageQuery.create(1, 5, ProductSortType.LATEST);
 
             // When
             PagedResult<ProductSummaryView> result = productFacade.getPagedProducts(query);
@@ -103,11 +103,11 @@ class ProductFacadeTest {
             // Then
 
             Assertions.assertAll(
-                    // 1 페이지
+                    // 0 페이지
                     () -> assertNotNull(result),
-                    () -> assertEquals(5, result.getItems().size()), // 1페이지에 5개 아이템
+                    () -> assertEquals(5, result.getItems().size()), // 0페이지에 5개 아이템
                     () -> assertEquals(10, result.getTotalItems()), // 전체 아이템 10개
-                    () -> assertEquals(1, result.getCurrentPage()), // 현재 페이지 1
+                    () -> assertEquals(0, result.getCurrentPage()), // 현재 페이지 0
                     () -> assertEquals(2, result.getTotalPages()), // 총 2페이지 (10개 / 5개)
                     () -> assertTrue(result.isHasNext()),// 다음 페이지 존재
 
@@ -117,11 +117,11 @@ class ProductFacadeTest {
                     () -> assertEquals("Product 6", result.getItems().get(4).getProductName()),
                     () -> assertEquals("Brand B", result.getItems().get(4).getBrandName()),
 
-                    // 2페이지
+                    // 1페이지
                     () -> assertNotNull(result2),
                     () -> assertEquals(5, result2.getItems().size()),
                     () -> assertEquals(10, result2.getTotalItems()),
-                    () -> assertEquals(2, result2.getCurrentPage()),
+                    () -> assertEquals(1, result2.getCurrentPage()),
                     () -> assertEquals(2, result2.getTotalPages()),
                     () -> assertFalse(result2.isHasNext()), // 다음 페이지 없음
 
@@ -142,7 +142,7 @@ class ProductFacadeTest {
             productRepository.save(Product.builder().name("P2").price(Money.of(200L)).stock(Stock.of(1L)).status(ProductStatus.ACTIVE).brandId(brand.getBrandId()).likeCount(15).build());
             productRepository.save(Product.builder().name("P3").price(Money.of(300L)).stock(Stock.of(1L)).status(ProductStatus.ACTIVE).brandId(brand.getBrandId()).likeCount(10).build());
 
-            ProductPageQuery query = ProductPageQuery.create(1, 3, ProductSortType.LIKES_DESC);
+            ProductPageQuery query = ProductPageQuery.create(0, 3, ProductSortType.LIKES_DESC);
 
             // When
             PagedResult<ProductSummaryView> result = productFacade.getPagedProducts(query);
@@ -151,7 +151,7 @@ class ProductFacadeTest {
             assertNotNull(result);
             assertEquals(3, result.getItems().size());
             assertEquals(3, result.getTotalItems());
-            assertEquals(1, result.getCurrentPage());
+            assertEquals(0, result.getCurrentPage());
             assertEquals(1, result.getTotalPages());
             assertFalse(result.isHasNext());
 
@@ -172,7 +172,7 @@ class ProductFacadeTest {
             productRepository.save(Product.builder().name("P2").price(Money.of(100L)).stock(Stock.of(1L)).status(ProductStatus.ACTIVE).brandId(brand.getBrandId()).likeCount(1).build());
             productRepository.save(Product.builder().name("P3").price(Money.of(200L)).stock(Stock.of(1L)).status(ProductStatus.ACTIVE).brandId(brand.getBrandId()).likeCount(1).build());
 
-            ProductPageQuery query = ProductPageQuery.create(1, 3, ProductSortType.PRICE_ASC);
+            ProductPageQuery query = ProductPageQuery.create(0, 3, ProductSortType.PRICE_ASC);
 
             // When
             PagedResult<ProductSummaryView> result = productFacade.getPagedProducts(query);
@@ -182,7 +182,7 @@ class ProductFacadeTest {
                     () -> assertNotNull(result),
                     () -> assertEquals(3, result.getItems().size()),
                     () -> assertEquals(3, result.getTotalItems()),
-                    () -> assertEquals(1, result.getCurrentPage()),
+                    () -> assertEquals(0, result.getCurrentPage()),
                     () -> assertEquals(1, result.getTotalPages()),
                     () -> assertFalse(result.isHasNext()),
 
@@ -198,7 +198,7 @@ class ProductFacadeTest {
         @DisplayName("상품이 없을 경우 빈 목록과 올바른 페이지 정보를 반환한다")
         void getPagedProducts_noProducts() {
             // Given
-            ProductPageQuery query = ProductPageQuery.create(1, 10, ProductSortType.LATEST);
+            ProductPageQuery query = ProductPageQuery.create(0, 10, ProductSortType.LATEST);
 
             // When
             PagedResult<ProductSummaryView> result = productFacade.getPagedProducts(query);
@@ -207,8 +207,8 @@ class ProductFacadeTest {
             assertNotNull(result);
             assertTrue(result.getItems().isEmpty());
             assertEquals(0, result.getTotalItems());
-            assertEquals(1, result.getCurrentPage());
-            assertEquals(1, result.getTotalPages());
+            assertEquals(0, result.getCurrentPage());
+            assertEquals(0, result.getTotalPages());
             assertFalse(result.isHasNext());
         }
     }
