@@ -6,6 +6,8 @@ import com.loopers.domain.product.ProductRepository;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,14 +23,10 @@ public class ProductRepositoryImpl implements ProductRepository {
     private final ProductJpaRepository productJpaRepository;
     private final JPAQueryFactory jpaQueryFactory;
 
+    // SELECT
     @Override
     public Optional<Product> findById(Long productId) {
         return productJpaRepository.findById(productId);
-    }
-
-    @Override
-    public List<Product> findAllByIds(List<Long> productIds) {
-        return productJpaRepository.findAllById(productIds);
     }
 
     @Override
@@ -41,13 +39,19 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public Product save(Product product) {
-        return productJpaRepository.save(product);
+    public long getTotalCount() {
+        return productJpaRepository.count();
     }
 
     @Override
-    public long getTotalCount() {
-        return productJpaRepository.count();
+    public List<Product> findAllByIdsWithPessimisticLock(List<Long> productIds) {
+        return productJpaRepository.findAllForUpdate(productIds);
+    }
+
+    // INSERT
+    @Override
+    public Product save(Product product) {
+        return productJpaRepository.save(product);
     }
 
     @Override
@@ -55,9 +59,15 @@ public class ProductRepositoryImpl implements ProductRepository {
         return productJpaRepository.saveAll(products);
     }
 
+    // UPDATE
     @Override
-    public List<Product> findAllByIdsWithPessimisticLock(List<Long> productIds) {
-        return productJpaRepository.findAllForUpdate(productIds);
+    public boolean incrementLikeCount(Long productId) {
+        return productJpaRepository.incrementLikeCount(productId) > 0;
+    }
+
+    @Override
+    public boolean decrementLikeCount(Long productId) {
+        return productJpaRepository.decrementLikeCount(productId) > 0;
     }
 
     private OrderSpecifier<?> productSort(ProductSortType productSortType) {

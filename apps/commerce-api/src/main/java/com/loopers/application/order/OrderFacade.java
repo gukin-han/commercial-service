@@ -10,7 +10,6 @@ import com.loopers.domain.coupon.CouponId;
 import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderService;
-import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.point.PointService;
 import com.loopers.domain.product.*;
@@ -64,14 +63,13 @@ public class OrderFacade {
         // 5. 포인트 차감
         pointService.deductPoints(user.getUserId(), totalPrice.subtract(discountAmount));
 
-
         // 6. 쿠폰 사용처리
         if (coupon != null) {
             coupon.use(order);
             couponRepository.save(coupon);
         }
 
-        return PlaceOrderResult.SUCCESS(order);
+        return PlaceOrderResult.success(order);
     }
 
 

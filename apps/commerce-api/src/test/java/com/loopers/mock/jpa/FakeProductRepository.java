@@ -33,15 +33,20 @@ public class FakeProductRepository extends FakeJpaRepository<Product> implements
     }
 
     @Override
+    public boolean incrementLikeCount(Long productId) {
+        return true;
+    }
+
+    @Override
+    public boolean decrementLikeCount(Long productId) {
+        return true;
+    }
+
+    @Override
     public Optional<Product> findById(Long productId) {
         return data.stream()
                 .filter(p -> p.getId() != null && p.getId().equals(productId))
                 .findFirst();
-    }
-
-    @Override
-    public List<Product> findAllByIds(List<Long> productIds) {
-        return null;
     }
 
     @Override

@@ -17,7 +17,7 @@ datasource:
       driver-class-name: com.mysql.cj.jdbc.Driver
       jdbc-url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}
       username: ${MYSQL_USER}
-      password: "${MYSQL_PWD}"
+      password: ${MYSQL_PWD}
       pool-name: mysql-main-pool
       maximum-pool-size: 40
       minimum-idle: 30

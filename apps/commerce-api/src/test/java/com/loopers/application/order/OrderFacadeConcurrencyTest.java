@@ -19,6 +19,8 @@ import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.product.Stock;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
+import com.loopers.support.ConcurrentTestResult;
+import com.loopers.support.ConcurrentTestRunner;
 import com.loopers.support.constant.Gender;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
@@ -27,13 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,19 +43,15 @@ public class OrderFacadeConcurrencyTest {
     private final ProductRepository productRepository;
     private final PointRepository pointRepository;
     private final CouponRepository couponRepository;
-    private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
 
     @Autowired
-    OrderFacadeConcurrencyTest(DatabaseCleanUp databaseCleanUp, OrderFacade orderFacade, UserRepository userRepository, ProductRepository productRepository, PointRepository pointRepository, CouponRepository couponRepository, OrderRepository orderRepository, OrderItemRepository orderItemRepository) {
+    OrderFacadeConcurrencyTest(DatabaseCleanUp databaseCleanUp, OrderFacade orderFacade, UserRepository userRepository, ProductRepository productRepository, PointRepository pointRepository, CouponRepository couponRepository) {
         this.databaseCleanUp = databaseCleanUp;
         this.orderFacade = orderFacade;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.pointRepository = pointRepository;
         this.couponRepository = couponRepository;
-        this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
     }
 
     @AfterEach
@@ -105,85 +97,45 @@ public class OrderFacadeConcurrencyTest {
         @Test
         void useCouponExactlyOnce() throws Exception {
             // given
-            int threadCount = 10;
-            ExecutorService pool = Executors.newFixedThreadPool(threadCount);
-
-            // 주문할 상품 준비
             List<CartItem> items = savedProducts.stream()
                     .map(p -> CartItem.of(p.getProductId().getValue(), 1L))
                     .toList();
             Cart cart = Cart.from(items);
             PlaceOrderCommand command = PlaceOrderCommand.of(cart, user1.getUserId().getValue(), coupon.getCouponId().getValue());
 
-            // 동시 시작/종료 장치
-            CyclicBarrier start = new CyclicBarrier(threadCount);
-            CountDownLatch done = new CountDownLatch(threadCount);
-            // 결과 수집 (스레드 안전)
-            List<Throwable> errors = Collections.synchronizedList(new ArrayList<>());
-            List<PlaceOrderResult> successes = Collections.synchronizedList(new ArrayList<>());
-            for (int i = 0; i < threadCount; i++) {
-                pool.submit(() -> {
-                    try {
-                        start.await(); // 모두 모여서 동시에 시작
-                        PlaceOrderResult r = orderFacade.placeOrder(command);
-                        successes.add(r);
-                    } catch (Throwable t) {
-                        errors.add(t);
-                    } finally {
-                        done.countDown();
-                    }
-                });
-            }
+            // when
+            ConcurrentTestResult<PlaceOrderResult> result = ConcurrentTestRunner.run(
+                    10,
+                    () -> orderFacade.placeOrder(command)
+            );
 
-            done.await();
-            pool.shutdown();
-
-            assertThat(successes).hasSize(1);
-            assertThat(errors).hasSize(9);
-            assertThat(errors.get(0)).isInstanceOf(ObjectOptimisticLockingFailureException.class);
+            // then
+            assertThat(result.getSuccesses()).hasSize(1);
+            assertThat(result.getErrors()).hasSize(9);
+            assertThat(result.getErrors().get(0)).isInstanceOf(ObjectOptimisticLockingFailureException.class);
         }
 
         @DisplayName("동일한 유저가 서로 다른 주문을 동시에 수행해도, 포인트가 정상적으로 차감되어야 한다.")
         @Test
         void deductPointsProperly() throws Exception {
             // given
-            int threadCount = 10;
-            ExecutorService pool = Executors.newFixedThreadPool(threadCount);
-
-            // 주문할 상품 준비
             List<CartItem> items = savedProducts.stream()
                     .map(p -> CartItem.of(p.getProductId().getValue(), 1L))
                     .toList();
             Cart cart = Cart.from(items);
             PlaceOrderCommand command = PlaceOrderCommand.of(cart, user1.getUserId().getValue(), null);
 
-            // 동시 시작/종료 장치
-            CyclicBarrier start = new CyclicBarrier(threadCount);
-            CountDownLatch done = new CountDownLatch(threadCount);
-            // 결과 수집 (스레드 안전)
-            List<Throwable> errors = Collections.synchronizedList(new ArrayList<>());
-            List<PlaceOrderResult> successes = Collections.synchronizedList(new ArrayList<>());
-            for (int i = 0; i < threadCount; i++) {
-                pool.submit(() -> {
-                    try {
-                        start.await(); // 모두 모여서 동시에 시작
-                        PlaceOrderResult r = orderFacade.placeOrder(command);
-                        successes.add(r);
-                    } catch (Throwable t) {
-                        errors.add(t);
-                    } finally {
-                        done.countDown();
-                    }
-                });
-            }
+            // when
+            ConcurrentTestResult<PlaceOrderResult> result = ConcurrentTestRunner.run(
+                    10,
+                    () -> orderFacade.placeOrder(command)
+            );
 
-            done.await();
-            pool.shutdown();
-
+            // then
             Point point = pointRepository.findByUserId(user1.getUserId()).get();
             Assertions.assertAll(
-                    () -> assertThat(successes).hasSize(10),
-                    () -> assertThat(errors).hasSize(0),
+                    () -> assertThat(result.getSuccesses()).hasSize(10),
+                    () -> assertThat(result.getErrors()).hasSize(0),
                     () -> assertThat(point.getBalance().getValue()).isEqualByComparingTo(BigDecimal.valueOf(850_000))
             );
         }
@@ -192,44 +144,24 @@ public class OrderFacadeConcurrencyTest {
         @Test
         void deductStocksProperly() throws Exception {
             // given
-            int threadCount = 10;
-            ExecutorService pool = Executors.newFixedThreadPool(threadCount);
-
-            // 주문할 상품 준비
             List<CartItem> items = savedProducts.stream()
                     .map(p -> CartItem.of(p.getProductId().getValue(), 1L))
                     .toList();
             Cart cart = Cart.from(items);
             PlaceOrderCommand command = PlaceOrderCommand.of(cart, user1.getUserId().getValue(), null);
 
-            // 동시 시작/종료 장치
-            CyclicBarrier start = new CyclicBarrier(threadCount);
-            CountDownLatch done = new CountDownLatch(threadCount);
-            // 결과 수집 (스레드 안전)
-            List<Throwable> errors = Collections.synchronizedList(new ArrayList<>());
-            List<PlaceOrderResult> successes = Collections.synchronizedList(new ArrayList<>());
-            for (int i = 0; i < threadCount; i++) {
-                pool.submit(() -> {
-                    try {
-                        start.await(); // 모두 모여서 동시에 시작
-                        PlaceOrderResult r = orderFacade.placeOrder(command);
-                        successes.add(r);
-                    } catch (Throwable t) {
-                        errors.add(t);
-                    } finally {
-                        done.countDown();
-                    }
-                });
-            }
+            // when
+            ConcurrentTestResult<PlaceOrderResult> result = ConcurrentTestRunner.run(
+                    10,
+                    () -> orderFacade.placeOrder(command)
+            );
 
-            done.await();
-            pool.shutdown();
-
+            // then
             Product product1 = productRepository.findById(savedProducts.get(0).getProductId().getValue()).get();
             Product product2 = productRepository.findById(savedProducts.get(1).getProductId().getValue()).get();
             Assertions.assertAll(
-                    () -> assertThat(successes).hasSize(10),
-                    () -> assertThat(errors).hasSize(0),
+                    () -> assertThat(result.getSuccesses()).hasSize(10),
+                    () -> assertThat(result.getErrors()).hasSize(0),
                     () -> assertThat(product1.getStock().getQuantity()).isEqualTo(990),
                     () -> assertThat(product2.getStock().getQuantity()).isEqualTo(990)
             );

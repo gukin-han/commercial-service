@@ -1,6 +1,7 @@
 package com.loopers.domain.order;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.coupon.CouponId;
 import com.loopers.domain.product.Money;
 import com.loopers.domain.user.UserId;
 import jakarta.persistence.*;
@@ -8,9 +9,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,15 +31,16 @@ public class Order extends BaseEntity {
     @Column(nullable = false)
     private OrderStatus status;
 
-
-
+    @Embedded
+    private CouponId couponId;
 
     @Builder
-    private Order(UserId userId, Money totalPrice, Money discountAmount, OrderStatus status) {
+    private Order(UserId userId, Money totalPrice, Money discountAmount, OrderStatus status, CouponId couponId) {
         this.userId = userId;
         this.totalPrice = totalPrice;
         this.discountAmount = discountAmount;
         this.status = status;
+        this.couponId = couponId;
     }
 
     public static Order of(UserId userId, Money totalPrice, Money discountAmount, OrderStatus status) {
