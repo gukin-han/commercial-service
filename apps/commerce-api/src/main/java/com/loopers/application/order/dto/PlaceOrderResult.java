@@ -19,7 +19,7 @@ public class PlaceOrderResult {
         this.orderId = orderId;
     }
 
-    public static PlaceOrderResult SUCCESS(Order order) {
+    public static PlaceOrderResult success(Order order) {
         return PlaceOrderResult.builder()
                 .status(Status.SUCCESS)
                 .orderId(order.getOrderId())
@@ -27,7 +27,7 @@ public class PlaceOrderResult {
                 .build();
     }
 
-    public static PlaceOrderResult FAIL(String message) {
+    public static PlaceOrderResult fail(String message) {
         return PlaceOrderResult.builder()
                 .status(Status.FAIL)
                 .message(message)
