@@ -1,9 +1,7 @@
 package com.loopers.domain.product;
 
 import com.loopers.application.product.dto.ProductSortType;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Component;
+import com.loopers.domain.brand.BrandId;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,11 +9,11 @@ import java.util.Optional;
 public interface ProductRepository {
     Optional<Product> findById(Long productId);
 
-    List<Product> findProducts(int page, int size, ProductSortType productSortType);
+    List<Product> findProducts(BrandId brandId, int page, int size, ProductSortType productSortType);
 
     Product save(Product product);
 
-    long getTotalCount();
+    long getTotalCountByBrandId(BrandId brandId);
 
     List<Product> saveAll(List<Product> products);
 

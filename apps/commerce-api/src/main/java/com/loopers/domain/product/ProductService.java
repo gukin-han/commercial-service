@@ -1,5 +1,7 @@
 package com.loopers.domain.product;
 
+import com.loopers.application.product.dto.ProductSortType;
+import com.loopers.domain.brand.BrandId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,6 +22,11 @@ public class ProductService {
     public Product findByProductId(ProductId productId) {
         return productRepository.findById(productId.getValue())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "조회할 수 없는 상품입니다."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> findProducts(BrandId brandId, int page, int size, ProductSortType sortType) {
+        return productRepository.findProducts(brandId, page, size, sortType);
     }
 
     public Product save(Product product) {

@@ -26,7 +26,6 @@ public class ProductFacade {
 
     private final ProductService productService;
     private final BrandService brandService;
-
     private final ProductRepository productRepository;
 
     @Transactional(readOnly = true)
@@ -39,11 +38,12 @@ public class ProductFacade {
 
     @Transactional(readOnly = true)
     public PagedResult<ProductSummaryView> getPagedProducts(ProductPageQuery query) {
-        List<Product> products = productRepository.findProducts(query.getPage(), query.getSize(), query.getSortType());
+        BrandId brandId = query.getBrandId() == null ? null : BrandId.of(query.getBrandId());
+        List<Product> products = productService.findProducts(brandId, query.getPage(), query.getSize(), query.getSortType());
         Map<BrandId, Brand> brandMap = getBrandIdToBrandMapFrom(products);
         List<ProductSummaryView> views = this.createProductSummaryViewsFrom(products, brandMap);
 
-        return PagedResult.of(views, query.getPage(), productRepository.getTotalCount(), query.getSize());
+        return PagedResult.of(views, query.getPage(), productRepository.getTotalCountByBrandId(brandId), query.getSize());
     }
 
     private Map<BrandId, Brand> getBrandIdToBrandMapFrom(List<Product> products) {

@@ -80,13 +80,17 @@ public class ProductV1Dto {
 
     @Data
     public static class GetProductsRequest {
-        @Schema(name = "sortType", description = "조회할 상품의 ID")
+
+        @Schema(name = "brandId", description = "필터 적용할 브랜드의 ID")
+        private Long brandId;
+
+        @Schema(name = "sortType", description = "정렬 타입")
         private ProductSortType sortType;
 
-        @Schema(name = "page", description = "조회할 상품의 ID")
+        @Schema(name = "page", description = "페이지 넘버")
         private int page = 0;
 
-        @Schema(name = "size", description = "조회할 상품의 ID")
+        @Schema(name = "size", description = "페이지 사이즈")
         private int size = 20;
     }
 

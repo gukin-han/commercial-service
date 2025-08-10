@@ -1,9 +1,11 @@
 package com.loopers.infrastructure.product;
 
 import com.loopers.application.product.dto.ProductSortType;
+import com.loopers.domain.brand.BrandId;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -30,17 +32,26 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public List<Product> findProducts(int page, int size, ProductSortType productSortType) {
+    public List<Product> findProducts(BrandId brandId, int page, int size, ProductSortType productSortType) {
         return jpaQueryFactory.selectFrom(product)
+                .where(brandEq(brandId))
                 .orderBy(productSort(productSortType))
                 .offset((long) page * size)
                 .limit(size)
                 .fetch();
     }
 
+    private BooleanExpression brandEq(BrandId brandId) {
+        return brandId == null ? null : product.brandId.eq(brandId);
+    }
+
     @Override
-    public long getTotalCount() {
-        return productJpaRepository.count();
+    public long getTotalCountByBrandId(BrandId brandId) {
+        if (brandId == null) {
+            return productJpaRepository.count();
+        } else {
+            return productJpaRepository.countByBrandId(brandId);
+        }
     }
 
     @Override

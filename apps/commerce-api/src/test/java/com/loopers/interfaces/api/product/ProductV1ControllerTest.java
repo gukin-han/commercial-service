@@ -92,6 +92,61 @@ class ProductV1ControllerTest {
                     () -> assertThat(Objects.requireNonNull(response.getBody()).data().getItems().get(0).getProductName()).isEqualTo("Product 19")
             );
         }
+
+        @Test
+        @DisplayName("brandId로 필터링하여 상품 목록 조회가 성공할 경우, 해당 브랜드의 상품 목록을 반환한다.")
+        void returnsFilteredProducts_whenBrandIdIsProvided() {
+            // given
+            Brand brandA = brandRepository.save(Brand.create("Brand A"));
+            Brand brandB = brandRepository.save(Brand.create("Brand B"));
+
+            for (int i = 0; i < 5; i++) {
+                productRepository.save(Product.builder()
+                        .name("Product A " + i)
+                        .price(Money.of(1000L * (i + 1)))
+                        .stock(Stock.of(10L))
+                        .status(ProductStatus.ACTIVE)
+                        .brandId(brandA.getBrandId())
+                        .likeCount(i)
+                        .build());
+            }
+            for (int i = 0; i < 3; i++) {
+                productRepository.save(Product.builder()
+                        .name("Product B " + i)
+                        .price(Money.of(1000L * (i + 1)))
+                        .stock(Stock.of(10L))
+                        .status(ProductStatus.ACTIVE)
+                        .brandId(brandB.getBrandId())
+                        .likeCount(i)
+                        .build());
+            }
+
+            URI uri = UriComponentsBuilder.fromUriString("/api/v1/products")
+                    .queryParam("page", "0")
+                    .queryParam("size", "10")
+                    .queryParam("sortType", "LATEST")
+                    .queryParam("brandId", brandA.getBrandId().getValue())
+                    .build()
+                    .toUri();
+
+            // when
+            ResponseEntity<ApiResponse<ProductV1Dto.GetProductsResponse>> response = testRestTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<>() {}
+            );
+
+            // then
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(Objects.requireNonNull(response.getBody()).data()).isNotNull(),
+                    () -> assertThat(Objects.requireNonNull(response.getBody()).data().getItems()).hasSize(5),
+                    () -> assertThat(Objects.requireNonNull(response.getBody()).data().getTotalItems()).isEqualTo(5),
+                    () -> assertThat(Objects.requireNonNull(response.getBody()).data().getItems())
+                            .allMatch(p -> p.getBrandName().equals("Brand A"))
+            );
+        }
     }
 
     @DisplayName("GET /api/v1/products/{productId}")

@@ -1,5 +1,6 @@
 package com.loopers.infrastructure.product;
 
+import com.loopers.domain.brand.BrandId;
 import com.loopers.domain.product.Product;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,4 +29,6 @@ public interface ProductJpaRepository extends JpaRepository<Product, Long> {
     @Modifying
     @Query(value = "UPDATE products SET like_count = GREATEST(like_count - 1, 0) WHERE id = :productId", nativeQuery = true)
     int decrementLikeCount(Long productId);
+
+    long countByBrandId(BrandId brandId);
 }
