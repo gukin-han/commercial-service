@@ -2,12 +2,11 @@ package com.loopers.application.like;
 
 import com.loopers.application.like.dto.LikeCommand;
 import com.loopers.application.like.dto.UnlikeCommand;
-import com.loopers.domain.like.ProductLikeRepository;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.support.ConcurrentTestRunner;
+import com.loopers.testhelper.ConcurrentTestRunner;
 import com.loopers.support.constant.Gender;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
@@ -24,19 +23,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class ProductLikeFacadeConcurrencyTest {
 
-    @Autowired
-    DatabaseCleanUp databaseCleanUp;
 
     @Autowired
     ProductRepository productRepository;
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    ProductLikeRepository productLikeRepository;
 
     @Autowired
     ProductLikeFacade sut;
 
+    @Autowired
+    DatabaseCleanUp databaseCleanUp;
     @AfterEach
     void tearDown() {
         databaseCleanUp.truncateAllTables();

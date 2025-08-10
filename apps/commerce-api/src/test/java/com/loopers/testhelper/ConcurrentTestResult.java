@@ -1,6 +1,4 @@
-package com.loopers.support;
-
-import lombok.Data;
+package com.loopers.testhelper;
 
 import java.util.List;
 

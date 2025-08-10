@@ -1,7 +1,4 @@
-package com.loopers.support;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
+package com.loopers.testhelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
