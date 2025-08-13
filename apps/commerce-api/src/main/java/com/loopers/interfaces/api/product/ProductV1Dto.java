@@ -81,17 +81,17 @@ public class ProductV1Dto {
     @Data
     public static class GetProductsRequest {
 
-        @Schema(name = "brandId", description = "필터 적용할 브랜드의 ID")
+        @Schema(description = "필터 적용할 브랜드의 ID")
         private Long brandId;
 
-        @Schema(name = "sortType", description = "정렬 타입")
+        @Schema(description = "정렬 타입")
         private ProductSortType sortType;
 
-        @Schema(name = "page", description = "페이지 넘버")
-        private int page = 0;
+        @Schema(description = "페이지 넘버 (0-base)", defaultValue = "0", minimum = "0")
+        private Integer page;
 
-        @Schema(name = "size", description = "페이지 사이즈")
-        private int size = 20;
+        @Schema(description = "페이지 사이즈", defaultValue = "20", minimum = "1", maximum = "100")
+        private Integer size;
     }
 
     @Data
