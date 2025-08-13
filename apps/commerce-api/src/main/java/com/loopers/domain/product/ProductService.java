@@ -4,14 +4,12 @@ import com.loopers.application.product.dto.ProductSortType;
 import com.loopers.domain.brand.BrandId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -25,8 +23,8 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<Product> findProducts(BrandId brandId, int page, int size, ProductSortType sortType) {
-        return productRepository.findProducts(brandId, page, size, sortType);
+    public List<ProductDetail> findProducts(BrandId brandId, int page, int size, ProductSortType sortType) {
+        return productRepository.findPagedProductDetails(brandId, page, size, sortType);
     }
 
     public Product save(Product product) {

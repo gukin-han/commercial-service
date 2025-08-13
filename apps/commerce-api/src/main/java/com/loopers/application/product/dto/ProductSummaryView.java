@@ -3,10 +3,6 @@ package com.loopers.application.product.dto;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandId;
 import com.loopers.domain.product.*;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Builder;
 import lombok.Data;
 
@@ -53,6 +49,18 @@ public class ProductSummaryView {
                 .price(product.getPrice())
                 .brandId(brand.getBrandId())
                 .brandName(brand.getName())
+                .build();
+    }
+
+    public static ProductSummaryView from(ProductDetail productDetail) {
+        return ProductSummaryView.builder()
+                .productId(ProductId.of(productDetail.getProductId()))
+                .productName(productDetail.getProductName())
+                .price(productDetail.getPrice())
+                .stock(productDetail.getStock())
+                .likeCount(productDetail.getLikeCount())
+                .brandId(productDetail.getBrandId())
+                .brandName(productDetail.getBrandName())
                 .build();
     }
 }

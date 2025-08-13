@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface ProductRepository {
     Optional<Product> findById(Long productId);
 
-    List<Product> findProducts(BrandId brandId, int page, int size, ProductSortType productSortType);
+    List<ProductDetail> findPagedProductDetails(BrandId brandId, int page, int size, ProductSortType productSortType);
 
     Product save(Product product);
 
