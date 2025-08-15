@@ -1,17 +1,26 @@
 package com.loopers.application.product;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.loopers.application.common.dto.PagedResult;
 import com.loopers.application.product.dto.*;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandId;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.product.*;
+import com.loopers.support.cache.CacheRepository;
 import com.loopers.utils.DatabaseCleanUp;
+import com.loopers.utils.RedisCleanUp;
 import org.junit.jupiter.api.*;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.Duration;
+import java.util.function.Supplier;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class ProductFacadeTest {
@@ -25,11 +34,17 @@ class ProductFacadeTest {
     @Autowired
     ProductFacade productFacade;
 
+
     @Autowired
-    DatabaseCleanUp databaseCleanUp;
+    private DatabaseCleanUp databaseCleanUp;
+
+    @Autowired
+    private RedisCleanUp redisCleanUp;
+
     @AfterEach
     void tearDown() {
         databaseCleanUp.truncateAllTables();
+        redisCleanUp.truncateAll();
     }
 
     @DisplayName("상품 상세 조회 시")
