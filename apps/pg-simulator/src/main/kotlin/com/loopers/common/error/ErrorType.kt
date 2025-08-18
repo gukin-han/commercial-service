@@ -1,4 +1,4 @@
-package com.loopers.support.error
+package com.loopers.common.error
 
 import org.springframework.http.HttpStatus
 

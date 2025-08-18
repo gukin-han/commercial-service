@@ -7,8 +7,8 @@ import com.loopers.domain.payment.PaymentRelay
 import com.loopers.domain.payment.PaymentRepository
 import com.loopers.domain.payment.TransactionKeyGenerator
 import com.loopers.domain.user.UserInfo
-import com.loopers.support.error.CoreException
-import com.loopers.support.error.ErrorType
+import com.loopers.common.error.CoreException
+import com.loopers.common.error.ErrorType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 

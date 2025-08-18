@@ -1,7 +1,7 @@
 package com.loopers.domain.payment
 
-import com.loopers.support.error.CoreException
-import com.loopers.support.error.ErrorType
+import com.loopers.common.error.CoreException
+import com.loopers.common.error.ErrorType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType

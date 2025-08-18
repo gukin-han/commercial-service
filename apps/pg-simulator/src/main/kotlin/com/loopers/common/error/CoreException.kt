@@ -1,4 +1,4 @@
-package com.loopers.support.error
+package com.loopers.common.error
 
 class CoreException(
     val errorType: ErrorType,

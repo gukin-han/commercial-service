@@ -1,8 +1,8 @@
 package com.loopers.interfaces.api.argumentresolver
 
 import com.loopers.domain.user.UserInfo
-import com.loopers.support.error.CoreException
-import com.loopers.support.error.ErrorType
+import com.loopers.common.error.CoreException
+import com.loopers.common.error.ErrorType
 import org.springframework.core.MethodParameter
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest

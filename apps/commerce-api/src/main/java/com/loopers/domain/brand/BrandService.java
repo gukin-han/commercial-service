@@ -1,8 +1,7 @@
 package com.loopers.domain.brand;
 
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
-import jakarta.persistence.EntityNotFoundException;
+import com.loopers.common.error.CoreException;
+import com.loopers.common.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

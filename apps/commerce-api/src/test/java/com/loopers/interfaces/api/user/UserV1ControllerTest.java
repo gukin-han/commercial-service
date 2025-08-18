@@ -2,7 +2,7 @@ package com.loopers.interfaces.api.user;
 
 import com.loopers.interfaces.api.ApiHeader;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.support.constant.Gender;
+import com.loopers.common.constant.Gender;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;

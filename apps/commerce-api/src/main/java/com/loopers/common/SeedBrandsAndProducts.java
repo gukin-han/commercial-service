@@ -1,4 +1,4 @@
-package com.loopers.support;
+package com.loopers.common;
 
 import java.math.*;
 import java.sql.*;

@@ -1,4 +1,4 @@
-package com.loopers.support.cache;
+package com.loopers.common.cache;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Duration;

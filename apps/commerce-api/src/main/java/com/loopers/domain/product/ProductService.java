@@ -2,8 +2,8 @@ package com.loopers.domain.product;
 
 import com.loopers.application.product.dto.ProductSortType;
 import com.loopers.domain.brand.BrandId;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
+import com.loopers.common.error.CoreException;
+import com.loopers.common.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
