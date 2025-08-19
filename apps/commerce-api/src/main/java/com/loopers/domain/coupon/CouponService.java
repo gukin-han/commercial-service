@@ -1,27 +1,34 @@
 package com.loopers.domain.coupon;
 
-import com.loopers.domain.coupon.Coupon;
-import com.loopers.domain.coupon.CouponId;
-import com.loopers.domain.coupon.CouponRepository;
+import com.loopers.common.error.CoreException;
+import com.loopers.common.error.ErrorType;
+import com.loopers.domain.product.Money;
 import com.loopers.domain.user.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class CouponService {
 
     private final CouponRepository couponRepository;
 
-    public Coupon getCouponByCouponIdAndUserId(CouponId couponId, UserId userId) {
-        Coupon coupon = couponRepository.findByIdAndCouponId(couponId, userId)
-                .orElse(null);
-
-        if (coupon != null && coupon.isUsed()) {
-            throw new IllegalStateException("쿠폰은 한 번만 사용할 수 있습니다.");
+    @Transactional
+    public Money apply(Long couponId, Long userId, Money totalPrice) {
+        if (couponId == null) {
+            return Money.ZERO;
         }
-        return coupon;
+
+        Coupon coupon = couponRepository.findByIdAndCouponId(CouponId.of(couponId), UserId.of(userId))
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "쿠폰을 찾을 수 없습니다."));
+
+        if (coupon.isUsed()) {
+            throw new CoreException(ErrorType.CONFLICT, "쿠폰은 한 번만 사용할 수 있습니다.");
+        }
+
+        coupon.use();
+        CouponDiscountCalculator calculator = new CouponDiscountCalculator();
+        return calculator.calculateDiscountAmount(coupon, totalPrice);
     }
 }

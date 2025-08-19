@@ -13,6 +13,7 @@ import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderItem;
 import com.loopers.domain.order.OrderItemRepository;
 import com.loopers.domain.order.OrderRepository;
+import com.loopers.domain.payment.PaymentMethod;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.Money;
@@ -107,7 +108,7 @@ class OrderFacadeIntegrationTest {
                 items.add(CartItem.of(p.getProductId().getValue(), 2L));
             }
             Cart cart = Cart.from(items);
-            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), coupon.getCouponId().getValue());
+            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), coupon.getCouponId().getValue(), PaymentMethod.POINT);
 
             //when
             PlaceOrderResult result = orderFacade.placeOrder(command);
@@ -133,7 +134,7 @@ class OrderFacadeIntegrationTest {
                     .toList();
             Cart cart = Cart.from(items);
             // command에 couponId로 null을 전달
-            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), null);
+            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), null, PaymentMethod.POINT);
 
             //when
             PlaceOrderResult result = orderFacade.placeOrder(command);
@@ -166,7 +167,7 @@ class OrderFacadeIntegrationTest {
                     .map(p -> CartItem.of(p.getProductId().getValue(), 1L))
                     .toList();
             Cart cart = Cart.from(items);
-            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), coupon.getCouponId().getValue());
+            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), coupon.getCouponId().getValue(), PaymentMethod.POINT);
 
             // 동시 시작/종료 장치
             CyclicBarrier start = new CyclicBarrier(threadCount);
@@ -191,9 +192,10 @@ class OrderFacadeIntegrationTest {
             done.await();
             pool.shutdown();
 
-            assertThat(successes).hasSize(1);
-            assertThat(errors).hasSize(9);
-            assertThat(errors.get(0)).isInstanceOf(ObjectOptimisticLockingFailureException.class);
+            Assertions.assertAll(
+                    () -> assertThat(successes).hasSize(1),
+                    () -> assertThat(errors).hasSize(9)
+            );
         }
     }
 }

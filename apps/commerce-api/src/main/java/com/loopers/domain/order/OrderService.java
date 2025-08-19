@@ -3,7 +3,6 @@ package com.loopers.domain.order;
 import com.loopers.domain.product.Money;
 import com.loopers.domain.product.ProductId;
 import com.loopers.domain.product.Stock;
-import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +19,8 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
 
     @Transactional
-    public Order create(UserId userId, Map<ProductId, Stock> productIdToStockMap, Money totalPrice, Money discountAmount) {
-        Order order = orderRepository.save(Order.of(userId, totalPrice, discountAmount, OrderStatus.PAID));
+    public Order createPending(Long userId, Map<ProductId, Stock> productIdToStockMap, Money totalPrice, Money discountAmount) {
+        Order order = orderRepository.save(Order.of(UserId.of(userId), totalPrice, discountAmount, OrderStatus.PENDING));
 
         List<OrderItem> orderItems = productIdToStockMap.entrySet().stream()
                 .map(entry -> OrderItem.of(order.getOrderId(), entry.getKey(), entry.getValue().getQuantity()))

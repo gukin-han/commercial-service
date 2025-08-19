@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     public User signUp(User user) {
         // 유저 정보 검증
         userRepository.findByLoginId(user.getLoginId())
@@ -29,10 +29,12 @@ public class UserService {
         return userRepository.findByLoginId(loginId).orElse(null);
     }
 
+    @Transactional
     public User findByUserId(UserId userId) {
         return userRepository.findByUserId(userId.getValue()).orElseThrow(EntityNotFoundException::new);
     }
 
+    @Transactional
     public User findByLoginId(String loginId) {
         return userRepository.findByLoginId(loginId).orElseThrow(EntityNotFoundException::new);
     }

@@ -1,17 +1,13 @@
 package com.loopers.application.order;
 
+import com.loopers.application.payment.PaymentDispatcher;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.application.order.dto.Cart;
 import com.loopers.application.order.dto.PlaceOrderCommand;
 import com.loopers.application.order.dto.PlaceOrderResult;
-import com.loopers.domain.coupon.Coupon;
-import com.loopers.domain.coupon.CouponDiscountCalculator;
-import com.loopers.domain.coupon.CouponId;
-import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderService;
-import com.loopers.domain.point.PointRepository;
-import com.loopers.domain.point.PointService;
+import com.loopers.domain.payment.PayCommand;
 import com.loopers.domain.product.*;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserId;
@@ -30,44 +26,31 @@ public class OrderFacade {
 
     private final ProductService productService;
     private final UserService userService;
-    private final PointService pointService;
     private final OrderService orderService;
     private final CouponService couponService;
-    private final CouponRepository couponRepository;
-    private final PointRepository pointRepository;
+    private final PaymentDispatcher paymentDispatcher;
 
     @Transactional
     public PlaceOrderResult placeOrder(PlaceOrderCommand command) {
+        // 1. 상품 재고 차감
         Map<ProductId, Stock> productIdToStockMap = this.getProductIdStockMap(command.getCart());
+        List<Product> products = productService.deductStocks(productIdToStockMap);
 
-        // 1. 사용자 정보 조회
-        User user = userService.findByUserId(UserId.of(command.getUserId()));
-
-        // 2. 상품 재고 차감
-        List<Product> products = productService.getAllByIdsIn(productIdToStockMap.keySet().stream().toList());
-        productService.deductStocks(products, productIdToStockMap);
-
-        // 3. 쿠폰 적용 및 할인 계산
+        // 2. 쿠폰 적용 및 할인 계산
         Money totalPrice = productService.calculateTotalPrice(products, productIdToStockMap);
-        Money discountAmount = Money.ZERO;
-        Coupon coupon = null;
-        if (command.getCouponId() != null) {
-            coupon = couponService.getCouponByCouponIdAndUserId(CouponId.of(command.getCouponId()), user.getUserId());
-            CouponDiscountCalculator calculator = new CouponDiscountCalculator();
-            discountAmount = calculator.calculateDiscountAmount(coupon, totalPrice);
-        }
+        Money discountPrice = couponService.apply(command.getCouponId(), command.getUserId(), totalPrice);
 
-        // 4. 주문 생성
-        Order order = orderService.create(user.getUserId(), productIdToStockMap, totalPrice, discountAmount);
+        // 3. 주문 생성
+        Order order = orderService.createPending(command.getUserId(), productIdToStockMap, totalPrice, discountPrice);
 
-        // 5. 포인트 차감
-        pointService.deductPoints(user.getUserId(), totalPrice.subtract(discountAmount));
-
-        // 6. 쿠폰 사용처리
-        if (coupon != null) {
-            coupon.use(order);
-            couponRepository.save(coupon);
-        }
+        // 4. 결제 처리
+        paymentDispatcher.pay(
+                PayCommand.builder()
+                        .userId(command.getUserId())
+                        .amount(totalPrice.subtract(discountPrice))
+                        .method(command.getPaymentMethod())
+                        .build()
+        );
 
         return PlaceOrderResult.success(order);
     }

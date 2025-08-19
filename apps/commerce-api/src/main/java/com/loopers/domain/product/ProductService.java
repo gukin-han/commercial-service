@@ -17,6 +17,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    @Transactional(readOnly = true)
     public Product findByProductId(ProductId productId) {
         return productRepository.findById(productId.getValue())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "조회할 수 없는 상품입니다."));
@@ -31,6 +32,7 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    @Transactional
     public List<Product> getAllByIdsIn(List<ProductId> productIds) {
         List<Long> sortedProductIds = productIds.stream()
                 .map(ProductId::getValue)
@@ -45,18 +47,28 @@ public class ProductService {
         return products;
     }
 
-    public void deductStocks(List<Product> products, Map<ProductId, Stock> productIdToStockMap) {
+    @Transactional
+    public List<Product> deductStocks(Map<ProductId, Stock> productIdToStockMap) {
+        List<Long> sortedProductIds = productIdToStockMap.keySet().stream()
+                .map(ProductId::getValue)
+                .sorted()
+                .toList();
+
+        List<Product> products = productRepository.findAllByIdsWithPessimisticLock(sortedProductIds);
+
+        if (products.size() != sortedProductIds.size()) {
+            throw new IllegalArgumentException("조회결과, 존재하지 않는 상품이 있습니다.");
+        }
         for (Product product : products) {
             ProductId productId = product.getProductId();
             Stock stock = productIdToStockMap.get(productId);
-            this.deductStock(product, stock);
+            product.decreaseStock(stock.getQuantity());
         }
+
+        return products;
     }
 
-    private void deductStock(Product product, Stock stock) {
-        product.decreaseStock(stock.getQuantity());
-    }
-
+    @Transactional
     public Money calculateTotalPrice(List<Product> products, Map<ProductId, Stock> productIdToStockMap) {
         Money totalPrice = Money.of(0L);
         for (Product product : products) {
