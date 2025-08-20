@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(
         name = "PaymentFeignClient",
-        url = "http://localhost:8082"
+        url = "http://localhost:8082",
+        configuration = PaymentFeignClientConfig.class
 )
 @Headers("Content-Type: application/json")
 public interface PaymentFeignClient {
@@ -20,5 +21,4 @@ public interface PaymentFeignClient {
             @RequestHeader("X-USER-ID") String loginId,
             @RequestBody PaymentRequest request
     );
-
 }

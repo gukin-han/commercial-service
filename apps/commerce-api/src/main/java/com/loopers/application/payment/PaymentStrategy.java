@@ -5,5 +5,5 @@ import com.loopers.domain.payment.PayResult;
 
 public interface PaymentStrategy {
     boolean supports(PayCommand command);
-    PayResult pay(PayCommand command);
+    PayResult requestPayment(PayCommand command);
 }

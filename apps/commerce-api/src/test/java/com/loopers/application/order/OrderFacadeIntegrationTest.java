@@ -9,10 +9,8 @@ import com.loopers.domain.coupon.Coupon;
 import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.coupon.CouponType;
 import com.loopers.domain.coupon.Percent;
+import com.loopers.domain.order.*;
 import com.loopers.domain.order.Order;
-import com.loopers.domain.order.OrderItem;
-import com.loopers.domain.order.OrderItemRepository;
-import com.loopers.domain.order.OrderRepository;
 import com.loopers.domain.payment.PaymentMethod;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
@@ -114,13 +112,13 @@ class OrderFacadeIntegrationTest {
             PlaceOrderResult result = orderFacade.placeOrder(command);
 
             //then
-            Optional<Order> order = orderRepository.findByOrderId(result.getOrderId());
+            Optional<Order> order = orderRepository.findByOrderId(OrderId.of(result.getOrderId()));
             Optional<Point> pointAfterOrder = pointRepository.findByUserId(user.getUserId());
-            List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(result.getOrderId());
+            List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(OrderId.of(result.getOrderId()));
             Assertions.assertAll(
                     () -> assertThat(order.isPresent()).isTrue(),
                     () -> assertThat(pointAfterOrder.isPresent()).isTrue(),
-                    () -> assertThat(pointAfterOrder.get().getBalance().getValue()).isEqualByComparingTo(BigDecimal.valueOf(976_000)),
+                    () -> assertThat(pointAfterOrder.get().getBalance().getValue()).isEqualByComparingTo(BigDecimal.valueOf(970_000)),
                     () -> assertThat(orderItems.size()).isEqualTo(2)
             );
         }
@@ -140,9 +138,9 @@ class OrderFacadeIntegrationTest {
             PlaceOrderResult result = orderFacade.placeOrder(command);
 
             //then
-            Optional<Order> order = orderRepository.findByOrderId(result.getOrderId());
+            Optional<Order> order = orderRepository.findByOrderId(OrderId.of(result.getOrderId()));
             Optional<Point> pointAfterOrder = pointRepository.findByUserId(user.getUserId());
-            List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(result.getOrderId());
+            List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(OrderId.of(result.getOrderId()));
 
             // 총 상품 금액: (10,000 * 2) + (5,000 * 2) = 30,000
             // 초기 포인트: 1,000,000

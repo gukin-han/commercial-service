@@ -8,15 +8,17 @@ import com.loopers.application.order.dto.PlaceOrderResult;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.PayCommand;
+import com.loopers.domain.payment.PayResult;
 import com.loopers.domain.product.*;
-import com.loopers.domain.user.User;
-import com.loopers.domain.user.UserId;
-import com.loopers.domain.user.UserService;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -24,35 +26,33 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderFacade {
 
+    private final PlatformTransactionManager tm;
+
     private final ProductService productService;
-    private final UserService userService;
     private final OrderService orderService;
     private final CouponService couponService;
     private final PaymentDispatcher paymentDispatcher;
 
-    @Transactional
     public PlaceOrderResult placeOrder(PlaceOrderCommand command) {
-        // 1. 상품 재고 차감
         Map<ProductId, Stock> productIdToStockMap = this.getProductIdStockMap(command.getCart());
-        List<Product> products = productService.deductStocks(productIdToStockMap);
 
-        // 2. 쿠폰 적용 및 할인 계산
-        Money totalPrice = productService.calculateTotalPrice(products, productIdToStockMap);
-        Money discountPrice = couponService.apply(command.getCouponId(), command.getUserId(), totalPrice);
+        TransactionTemplate tx = new TransactionTemplate(tm);
+        Order pending = tx.execute(status -> {
+            // 1. 상품 재고 차감
+            productService.deductStocks(productIdToStockMap);
 
-        // 3. 주문 생성
-        Order order = orderService.createPending(command.getUserId(), productIdToStockMap, totalPrice, discountPrice);
+            // 2. 쿠폰 적용 및 할인 계산
+            Money totalPrice = productService.calculateTotalPrice(productIdToStockMap);
+            Money discountPrice = couponService.apply(command.getCouponId(), command.getUserId(), totalPrice);
 
-        // 4. 결제 처리
-        paymentDispatcher.pay(
-                PayCommand.builder()
-                        .userId(command.getUserId())
-                        .amount(totalPrice.subtract(discountPrice))
-                        .method(command.getPaymentMethod())
-                        .build()
-        );
+            // 3. 주문 생성
+            return orderService.create(command.getUserId(), productIdToStockMap, totalPrice, discountPrice);
+        });
 
-        return PlaceOrderResult.success(order);
+        // 4. 결제 요청
+        PayResult payResult = paymentDispatcher.requestPayment(PayCommand.from(pending, command.getPaymentMethod()));
+
+        return PlaceOrderResult.success(pending.getOrderId());
     }
 
 
@@ -62,5 +62,14 @@ public class OrderFacade {
                         it -> ProductId.of(it.getProductId()),
                         it -> Stock.of(it.getQuantity()))
                 );
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    static class Pending {
+        private Long orderId;
+        private Long userId;
+        private Money payAmount;
     }
 }

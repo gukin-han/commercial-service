@@ -93,6 +93,11 @@ public class ProductRepositoryImpl implements ProductRepository {
         return productJpaRepository.decrementLikeCount(productId) > 0;
     }
 
+    @Override
+    public List<Product> findAllById(List<Long> productIds) {
+        return productJpaRepository.findAllById(productIds);
+    }
+
     private OrderSpecifier<?>[] productSort(ProductSortType s) {
         return switch (s) {
             case LATEST ->

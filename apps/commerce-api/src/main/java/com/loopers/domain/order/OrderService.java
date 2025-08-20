@@ -19,8 +19,8 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
 
     @Transactional
-    public Order createPending(Long userId, Map<ProductId, Stock> productIdToStockMap, Money totalPrice, Money discountAmount) {
-        Order order = orderRepository.save(Order.of(UserId.of(userId), totalPrice, discountAmount, OrderStatus.PENDING));
+    public Order create(Long userId, Map<ProductId, Stock> productIdToStockMap, Money totalPrice, Money discountAmount) {
+        Order order = orderRepository.save(Order.of(UserId.of(userId), totalPrice, discountAmount, OrderStatus.CREATED));
 
         List<OrderItem> orderItems = productIdToStockMap.entrySet().stream()
                 .map(entry -> OrderItem.of(order.getOrderId(), entry.getKey(), entry.getValue().getQuantity()))

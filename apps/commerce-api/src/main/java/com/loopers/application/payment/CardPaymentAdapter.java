@@ -1,9 +1,8 @@
 package com.loopers.application.payment;
 
-import com.loopers.domain.payment.PayCommand;
-import com.loopers.domain.payment.PayResult;
-import com.loopers.domain.payment.PaymentClient;
-import com.loopers.domain.payment.PaymentMethod;
+import com.loopers.common.error.CoreException;
+import com.loopers.common.error.ErrorType;
+import com.loopers.domain.payment.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +11,8 @@ import org.springframework.stereotype.Component;
 public class CardPaymentAdapter implements PaymentStrategy {
 
     private final PaymentClient paymentClient;
+    private final PaymentRepository paymentRepository;
+
 
     @Override
     public boolean supports(PayCommand command) {
@@ -19,7 +20,19 @@ public class CardPaymentAdapter implements PaymentStrategy {
     }
 
     @Override
-    public PayResult pay(PayCommand command) {
-        return paymentClient.requestPayment(command);
+    public PayResult requestPayment(PayCommand command) {
+        // 결제 정보 먼저 생성
+        Payment payment = Payment.createPending(command.getUserId(), command.getOrderId(), command.getAmount(), PaymentMethod.CARD);
+        try {
+            // 결제 요청
+            return paymentClient.requestPayment(command);
+        } catch (Throwable e) {
+            // 에러 발생시 결제 실패 처리
+            payment.fails();
+            return PayResult.fail(PayResult.FailureReason.NETWORK_ERROR);
+        } finally {
+            // 결제 정보 저장
+            paymentRepository.save(payment);
+        }
     }
 }

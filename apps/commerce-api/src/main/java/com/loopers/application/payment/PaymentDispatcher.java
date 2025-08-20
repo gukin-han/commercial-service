@@ -15,12 +15,11 @@ public class PaymentDispatcher {
 
     private final List<PaymentStrategy> strategies;
 
-    public PayResult pay(PayCommand command) {
+    public PayResult requestPayment(PayCommand command) {
         PaymentStrategy strategy = strategies.stream()
                 .filter(s -> s.supports(command))
                 .findFirst()
                 .orElseThrow(() -> new CoreException(ErrorType.CONFLICT,"지원하지 않는 결제수단: " + command.getMethod()));
-
-        return strategy.pay(command);
+        return strategy.requestPayment(command);
     }
 }
