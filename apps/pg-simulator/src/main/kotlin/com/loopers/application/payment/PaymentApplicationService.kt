@@ -4,7 +4,7 @@ import com.loopers.domain.payment.Payment
 import com.loopers.domain.payment.PaymentEvent
 import com.loopers.domain.payment.PaymentEventPublisher
 import com.loopers.domain.payment.PaymentRelay
-import com.loopers.domain.payment.PaymentRepository
+import com.loopers.domain.payment.PaymentGatewayRepository
 import com.loopers.domain.payment.TransactionKeyGenerator
 import com.loopers.domain.user.UserInfo
 import com.loopers.common.error.CoreException
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Component
 class PaymentApplicationService(
-    private val paymentRepository: PaymentRepository,
+    private val paymentGatewayRepository: PaymentGatewayRepository,
     private val paymentEventPublisher: PaymentEventPublisher,
     private val paymentRelay: PaymentRelay,
     private val transactionKeyGenerator: TransactionKeyGenerator,
@@ -29,7 +29,7 @@ class PaymentApplicationService(
         command.validate()
 
         val transactionKey = transactionKeyGenerator.generate()
-        val payment = paymentRepository.save(
+        val payment = paymentGatewayRepository.save(
             Payment(
                 transactionKey = transactionKey,
                 userId = command.userId,
@@ -48,14 +48,14 @@ class PaymentApplicationService(
 
     @Transactional(readOnly = true)
     fun getTransactionDetailInfo(userInfo: UserInfo, transactionKey: String): TransactionInfo {
-        val payment = paymentRepository.findByTransactionKey(userId = userInfo.userId, transactionKey = transactionKey)
+        val payment = paymentGatewayRepository.findByTransactionKey(userId = userInfo.userId, transactionKey = transactionKey)
             ?: throw CoreException(ErrorType.NOT_FOUND, "(transactionKey: $transactionKey) 결제건이 존재하지 않습니다.")
         return TransactionInfo.from(payment)
     }
 
     @Transactional(readOnly = true)
     fun findTransactionsByOrderId(userInfo: UserInfo, orderId: String): OrderInfo {
-        val payments = paymentRepository.findByOrderId(userId = userInfo.userId, orderId = orderId)
+        val payments = paymentGatewayRepository.findByOrderId(userId = userInfo.userId, orderId = orderId)
         if (payments.isEmpty()) {
             throw CoreException(ErrorType.NOT_FOUND, "(orderId: $orderId) 에 해당하는 결제건이 존재하지 않습니다.")
         }
@@ -68,7 +68,7 @@ class PaymentApplicationService(
 
     @Transactional
     fun handle(transactionKey: String) {
-        val payment = paymentRepository.findByTransactionKey(transactionKey)
+        val payment = paymentGatewayRepository.findByTransactionKey(transactionKey)
             ?: throw CoreException(ErrorType.NOT_FOUND, "(transactionKey: $transactionKey) 결제건이 존재하지 않습니다.")
 
         val rate = (1..100).random()
@@ -81,7 +81,7 @@ class PaymentApplicationService(
     }
 
     fun notifyTransactionResult(transactionKey: String) {
-        val payment = paymentRepository.findByTransactionKey(transactionKey)
+        val payment = paymentGatewayRepository.findByTransactionKey(transactionKey)
             ?: throw CoreException(ErrorType.NOT_FOUND, "(transactionKey: $transactionKey) 결제건이 존재하지 않습니다.")
         paymentRelay.notify(callbackUrl = payment.callbackUrl, transactionInfo = TransactionInfo.from(payment))
     }

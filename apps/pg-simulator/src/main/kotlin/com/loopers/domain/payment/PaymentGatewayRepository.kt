@@ -1,6 +1,6 @@
 package com.loopers.domain.payment
 
-interface PaymentRepository {
+interface PaymentGatewayRepository {
     fun save(payment: Payment): Payment
     fun findByTransactionKey(transactionKey: String): Payment?
     fun findByTransactionKey(userId: String, transactionKey: String): Payment?
