@@ -1,6 +1,6 @@
 package com.loopers.application.order;
 
-import com.loopers.application.payment.PaymentDispatcher;
+import com.loopers.application.payment.PaymentProcessor;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.application.order.dto.Cart;
 import com.loopers.application.order.dto.PlaceOrderCommand;
@@ -16,7 +16,6 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Map;
@@ -31,7 +30,7 @@ public class OrderFacade {
     private final ProductService productService;
     private final OrderService orderService;
     private final CouponService couponService;
-    private final PaymentDispatcher paymentDispatcher;
+    private final PaymentProcessor paymentProcessor;
 
     public PlaceOrderResult placeOrder(PlaceOrderCommand command) {
         Map<ProductId, Stock> productIdToStockMap = this.getProductIdStockMap(command.getCart());
@@ -50,7 +49,7 @@ public class OrderFacade {
         });
 
         // 4. 결제 요청
-        PayResult payResult = paymentDispatcher.requestPayment(PayCommand.from(pending, command.getPaymentMethod()));
+        PayResult payResult = paymentProcessor.requestPayment(PayCommand.from(pending, command.getPaymentMethod()));
 
         return PlaceOrderResult.success(pending.getOrderId());
     }

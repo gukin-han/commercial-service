@@ -1,7 +1,7 @@
 package com.loopers.domain.payment;
 
 import com.loopers.domain.point.Point;
-import com.loopers.infrastructure.payment.dto.PaymentResponse;
+import com.loopers.infrastructure.http.payment.dto.PaymentClientV1Dto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,7 +17,7 @@ public class PayResult {
         this.reason = reason;
     }
 
-    public static PayResult from(PaymentResponse response) {
+    public static PayResult from(PaymentClientV1Dto response) {
         return null;
     }
 

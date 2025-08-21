@@ -2,7 +2,6 @@ package com.loopers.domain.payment;
 
 import com.loopers.domain.order.Order;
 import com.loopers.domain.product.Money;
-import com.loopers.infrastructure.payment.dto.PaymentRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +16,11 @@ public class PayCommand {
     private Money amount;
     private PaymentMethod method;
 
+    // Optional fields for payment processing
+    private String callbackUrl;
+    private String cardType;
+    private String cardNo;
+
     public static PayCommand from(Order order, PaymentMethod method) {
         return PayCommand.builder()
                 .orderId(order.getId())
@@ -24,9 +28,5 @@ public class PayCommand {
                 .amount(order.getTotalPrice())
                 .method(method)
                 .build();
-    }
-
-    public PaymentRequest toRequest() {
-        return null;
     }
 }
