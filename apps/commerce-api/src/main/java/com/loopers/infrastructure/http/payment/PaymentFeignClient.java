@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @Headers("Content-Type: application/json")
 public interface PaymentFeignClient {
 
-    @PostMapping("/api/v1/payments")
+    @PostMapping("/api/v1/payment")
     HttpResponse<PaymentClientV1Dto.PaymentResponse> requestPayment(
             @RequestHeader("X-USER-ID") String loginId,
             @RequestBody PaymentClientV1Dto.PaymentRequest request

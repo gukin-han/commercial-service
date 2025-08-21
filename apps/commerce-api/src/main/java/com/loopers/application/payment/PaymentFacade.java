@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PaymentFacade {
 
+    // TODO : 어디에 둘지 고민해보기
+    public static final String BASE_CALLBACK_URL = "http://localhost:8080/api/v1/payments/%s/callback";
     private final PaymentRepository paymentRepository;
     private final PaymentStrategyRouter router;
     private final UserService userService;
@@ -44,19 +46,18 @@ public class PaymentFacade {
         User user = userService.getByLoginId(loginId);
         Order order = orderService.get(command.orderId());
 
-        PaymentStrategy paymentStrategy = router.requestPayment(command.method());
-
         PayCommand payCommand = PayCommand.builder()
                 .orderId(order.getId())
                 .userId(user.getId())
                 .loginId(user.getLoginId())
                 .amount(order.getTotalPrice().subtract(order.getDiscountAmount()))
                 .method(command.method())
-                .callbackUrl(command.callbackUrl())
+                .callbackUrl(String.format(BASE_CALLBACK_URL, order.getId()))
                 .cardType(command.cardType())
                 .cardNo(command.cardNo())
                 .build();
 
+        PaymentStrategy paymentStrategy = router.requestPayment(command.method());
         return paymentStrategy.requestPayment(payCommand);
     }
 }

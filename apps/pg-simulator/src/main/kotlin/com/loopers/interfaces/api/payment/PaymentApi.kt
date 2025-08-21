@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1/payments")
+@RequestMapping("/api/v1/payment")
 class PaymentApi(
     private val paymentApplicationService: PaymentApplicationService,
 ) {

@@ -5,6 +5,8 @@ import com.loopers.common.constant.Gender;
 import com.loopers.common.error.CoreException;
 import com.loopers.common.error.ErrorType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,6 +22,8 @@ public class User extends BaseEntity {
     private String loginId;
     private String email;
     private String dateOfBirth;
+
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @Builder
