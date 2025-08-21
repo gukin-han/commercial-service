@@ -34,6 +34,10 @@ public class PayResult {
                 .build();
     }
 
+    public boolean isSuccess() {
+        return this.status == Status.SUCCESS;
+    }
+
     public enum Status {
         SUCCESS, // 결제 성공
         FAILED,  // 결제 실패
@@ -44,7 +48,7 @@ public class PayResult {
         INSUFFICIENT_FUNDS, // 잔액 부족
         INVALID_PAYMENT_METHOD, // 잘못된 결제 수단
         NETWORK_ERROR, // 네트워크 오류
-        UNKNOWN_ERROR // 알 수 없는 오류
+        UPSTREAM_FAILURE, UNKNOWN_ERROR // 알 수 없는 오류
     }
 }
 

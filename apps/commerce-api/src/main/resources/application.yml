@@ -30,6 +30,39 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+resilience4j:
+  circuitbreaker:
+    circuitBreakerAspectOrder: 1
+  retry:
+    retryAspectOrder: 2
+
+resilience4j.circuitbreaker:
+  instances:
+    pg:
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      permittedNumberOfCallsInHalfOpenState: 3
+      slidingWindowType: TIME_BASED
+      minimumNumberOfCalls: 20
+      waitDurationInOpenState: 50s
+      failureRateThreshold: 50
+      eventConsumerBufferSize: 10
+      recordFailurePredicate:
+
+resilience4j.retry:
+  instances:
+    pgRetry:
+      maxAttempts: 2
+      waitDuration: 1s
+#      enableExponentialBackoff: true
+#      exponentialBackoffMultiplier: 2
+      retryExceptions:
+        - com.loopers.infrastructure.http.payment.error.PgTransientException
+        - feign.RetryableException         # 진짜 네트워크 실패도 재시도
+      ignoreExceptions:
+        - com.loopers.infrastructure.http.payment.error.PgBusinessException
+      fail-after-max-attempts: true
+
 ---
 spring:
   config:
