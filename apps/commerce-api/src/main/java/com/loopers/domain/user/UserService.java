@@ -35,7 +35,7 @@ public class UserService {
     }
 
     @Transactional
-    public User findByLoginId(String loginId) {
+    public User getByLoginId(String loginId) {
         return userRepository.findByLoginId(loginId).orElseThrow(EntityNotFoundException::new);
     }
 }

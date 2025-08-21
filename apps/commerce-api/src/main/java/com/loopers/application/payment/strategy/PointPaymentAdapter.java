@@ -12,14 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class PointPaymentStrategy implements PaymentStrategy {
+public class PointPaymentAdapter implements PaymentStrategy {
 
     private final PointRepository pointRepository;
     private final PaymentRepository paymentRepository;
 
     @Override
-    public boolean supports(PayCommand command) {
-        return command.getMethod() == PaymentMethod.POINT;
+    public boolean supports(PaymentMethod method) {
+        return method == PaymentMethod.POINT;
     }
 
     @Override

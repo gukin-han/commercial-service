@@ -1,6 +1,6 @@
 package com.loopers.application.order;
 
-import com.loopers.application.payment.strategy.PaymentProcessor;
+import com.loopers.application.payment.strategy.PaymentStrategyRouter;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.application.order.dto.Cart;
 import com.loopers.application.order.dto.PlaceOrderCommand;
@@ -25,7 +25,7 @@ public class OrderFacade {
     private final ProductService productService;
     private final OrderService orderService;
     private final CouponService couponService;
-    private final PaymentProcessor paymentProcessor;
+    private final PaymentStrategyRouter paymentStrategyRouter;
 
     @Transactional
     public PlaceOrderResult placeOrder(PlaceOrderCommand command) {

@@ -6,15 +6,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CardPaymentStrategy implements PaymentStrategy {
+public class CardPaymentAdapter implements PaymentStrategy {
 
     private final PaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
 
 
     @Override
-    public boolean supports(PayCommand command) {
-        return command.getMethod() == PaymentMethod.CARD;
+    public boolean supports(PaymentMethod method) {
+        return method == PaymentMethod.CARD;
     }
 
     @Override
