@@ -30,16 +30,7 @@ public class PaymentFacade {
     private final UserService userService;
     private final OrderService orderService;
 
-    @Transactional
-    public void syncPaymentCallback(SyncPaymentCommand command) {
-        // 결제 상태 동기화 로직
-        // 1. 주문 ID로 결제 정보 조회
-        Payment payment = paymentRepository.findByOrderId(command.getOrderId())
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다."));
 
-        // 2. 결제 상태 업데이트
-//        payment.syncStatus(command.getStatus());
-    }
 
 //    @Transactional
     public PayResult initiatePayment(String loginId, InitiateCommand command) {
@@ -59,5 +50,22 @@ public class PaymentFacade {
 
         PaymentStrategy paymentStrategy = router.requestPayment(command.method());
         return paymentStrategy.requestPayment(payCommand);
+    }
+
+    public void syncPaymentCallbacks() {
+
+    }
+
+    @Transactional
+    public void syncPaymentCallback(SyncPaymentCommand command) {
+        // 결제 상태 동기화 로직
+        // 1. 주문 ID로 결제 정보 조회
+        Payment payment = paymentRepository.findByOrderId(command.getOrderId())
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다."));
+
+        // 2. 결제 상태 업데이트
+        payment.syncStatus(command.getStatus(), command.getReason());
+
+        // 3. 성공/실패에 따라 주문 상태 업데이트 (생략)
     }
 }

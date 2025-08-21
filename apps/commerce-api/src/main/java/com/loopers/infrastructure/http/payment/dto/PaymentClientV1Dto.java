@@ -1,8 +1,9 @@
 package com.loopers.infrastructure.http.payment.dto;
 
 import com.loopers.domain.payment.PayCommand;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
+
+import java.util.List;
 
 public class PaymentClientV1Dto {
 
@@ -32,6 +33,21 @@ public class PaymentClientV1Dto {
                     .amount(command.getAmount().toString())
                     .callbackUrl(command.getCallbackUrl())
                     .build();
+        }
+    }
+
+    public record GetTransactionResponse(
+            String orderId,
+            List<Transaction> transactions
+    ) {
+        public record Transaction(
+                String transactionKey,
+                Status status,
+                String reason
+        ) {
+            public enum Status {
+                SUCCESS, FAILED
+            }
         }
     }
 }

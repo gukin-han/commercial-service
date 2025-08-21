@@ -19,6 +19,7 @@ public class Payment extends BaseEntity {
     private Long userId;
     private PaymentMethod method;
     private PaymentStatus status;
+    private String reason;
 
     private ZonedDateTime completedAt;
     private ZonedDateTime failedAt;
@@ -59,5 +60,19 @@ public class Payment extends BaseEntity {
 
     public void complete() {
         this.status = PaymentStatus.COMPLETED;
+    }
+
+    public void syncStatus(String status, String reason) {
+        if ("SUCCESS".equals(status)) {
+            this.status = PaymentStatus.COMPLETED;
+            this.completedAt = ZonedDateTime.now();
+        }
+
+        if ("FAILED".equals(status)) {
+            this.status = PaymentStatus.FAILED;
+            this.failedAt = ZonedDateTime.now();
+        }
+
+        this.reason = status;
     }
 }

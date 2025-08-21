@@ -20,17 +20,17 @@ public class CardPaymentAdapter implements PaymentStrategy {
     @Override
     public PayResult requestPayment(PayCommand command) {
         // 결제 정보 먼저 생성
-        Payment payment = Payment.createPending(command.getUserId(), command.getOrderId(), command.getAmount(), PaymentMethod.CARD);
         try {
             // 결제 요청
-            return paymentClient.requestPayment(command);
+            PayResult result = paymentClient.requestPayment(command);
+            Payment payment = Payment.createPending(command.getUserId(), command.getOrderId(), command.getAmount(), PaymentMethod.CARD);
+            paymentRepository.save(payment);
+            return result;
         } catch (Throwable e) {
             // 에러 발생시 결제 실패 처리
-            payment.fails();
-            return PayResult.fail(PayResult.FailureReason.NETWORK_ERROR);
-        } finally {
-            // 결제 정보 저장
+            Payment payment = Payment.createFailed(command.getUserId(), command.getOrderId(), command.getAmount(), PaymentMethod.CARD);
             paymentRepository.save(payment);
+            return PayResult.fail(PayResult.FailureReason.NETWORK_ERROR);
         }
     }
 }

@@ -23,21 +23,33 @@ public class PaymentV1Dto {
     }
 
     public record InitiateRequest(
-        Long orderId,
-        PaymentMethod method,
-        String callbackUrl,
-        String cardType,
-        String cardNo
+            Long orderId,
+            PaymentMethod method,
+            String callbackUrl,
+            String cardType,
+            String cardNo
     ) {
 
         public InitiateCommand toCommand() {
             return InitiateCommand.builder()
-                .orderId(orderId)
-                .method(method)
-                .callbackUrl(callbackUrl)
-                .cardType(cardType)
-                .cardNo(cardNo)
-                .build();
+                    .orderId(orderId)
+                    .method(method)
+                    .callbackUrl(callbackUrl)
+                    .cardType(cardType)
+                    .cardNo(cardNo)
+                    .build();
         }
+    }
+
+    public record SyncPaymentCallbackRequest(
+            String transactionKey,
+            Long orderId,
+            String cardType,
+            String cardNo,
+            Long amount,
+            String status,
+            String reason
+    ) {
+
     }
 }

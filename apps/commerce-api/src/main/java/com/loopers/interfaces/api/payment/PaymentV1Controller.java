@@ -32,12 +32,10 @@ public class PaymentV1Controller implements PaymentV1ApiSpec {
     @Override
     @PostMapping("/{orderId}/callback")
     public ApiResponse<PaymentV1Dto.SyncPaymentCallbackResponse> syncPaymentCallback(
-            @RequestHeader(LOGIN_ID) String loginId,
             @PathVariable(value = "orderId") Long orderId,
-            @RequestBody Map<String, String> requestBody
+            @RequestBody PaymentV1Dto.SyncPaymentCallbackRequest request
     ) {
-
-        paymentFacade.syncPaymentCallback(SyncPaymentCommand.of(loginId, orderId));
+        paymentFacade.syncPaymentCallback(SyncPaymentCommand.of(orderId, request.status(), request.reason()));
         return ApiResponse.success(PaymentV1Dto.SyncPaymentCallbackResponse.builder()
                 .message("결제 상태 동기화가 완료되었습니다.")
                 .build());
