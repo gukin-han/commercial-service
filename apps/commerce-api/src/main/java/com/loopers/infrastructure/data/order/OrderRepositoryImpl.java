@@ -1,4 +1,4 @@
-package com.loopers.infrastructure.order;
+package com.loopers.infrastructure.data.order;
 
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderId;

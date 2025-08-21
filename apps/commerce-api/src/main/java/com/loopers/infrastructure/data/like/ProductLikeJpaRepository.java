@@ -1,4 +1,4 @@
-package com.loopers.infrastructure.like;
+package com.loopers.infrastructure.data.like;
 
 import com.loopers.domain.like.ProductLike;
 import com.loopers.domain.product.ProductId;

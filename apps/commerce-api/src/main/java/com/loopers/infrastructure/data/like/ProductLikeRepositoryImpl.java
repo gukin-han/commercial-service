@@ -1,12 +1,10 @@
-package com.loopers.infrastructure.like;
+package com.loopers.infrastructure.data.like;
 
 import com.loopers.domain.like.ProductLike;
 import com.loopers.domain.like.ProductLikeRepository;
 import com.loopers.domain.product.ProductId;
 import com.loopers.domain.user.UserId;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
