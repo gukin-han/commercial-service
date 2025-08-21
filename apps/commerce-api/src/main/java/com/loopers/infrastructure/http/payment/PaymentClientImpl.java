@@ -7,6 +7,7 @@ import com.loopers.infrastructure.http.HttpResponse;
 import com.loopers.infrastructure.http.payment.dto.PaymentClientV1Dto;
 import com.loopers.infrastructure.http.payment.error.PgBusinessException;
 import com.loopers.infrastructure.http.payment.error.PgTransientException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,8 @@ public class PaymentClientImpl implements PaymentClient {
 
     private final PaymentFeignClient paymentFeignClient;
 
-    @Retry(name = "pgRetry", fallbackMethod = "retryFallback")
+    @Retry(name = "pgRetry", fallbackMethod = "fallback")
+    @CircuitBreaker(name = "pgCircuit", fallbackMethod = "fallback")
     @Override
     public PayResult requestPayment(PayCommand command) {
         HttpResponse<PaymentClientV1Dto.PaymentResponse> response = paymentFeignClient.requestPayment(
@@ -45,7 +47,7 @@ public class PaymentClientImpl implements PaymentClient {
     }
 
     @SuppressWarnings("unused")
-    private PayResult retryFallback(PayCommand command, Throwable t) {
+    private PayResult fallback(PayCommand command, Throwable t) {
         log.warn("PG 요청 재시도 실패: {}, command: {}", t.getMessage(), command);
         return PayResult.fail(
                 (t instanceof PgBusinessException)
