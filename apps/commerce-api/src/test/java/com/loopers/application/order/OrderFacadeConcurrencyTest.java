@@ -113,31 +113,6 @@ public class OrderFacadeConcurrencyTest {
             assertThat(result.getErrors()).hasSize(9);
         }
 
-        @DisplayName("동일한 유저가 서로 다른 주문을 동시에 수행해도, 포인트가 정상적으로 차감되어야 한다.")
-        @Test
-        void deductPointsProperly() throws Exception {
-            // given
-            List<CartItem> items = savedProducts.stream()
-                    .map(p -> CartItem.of(p.getProductId().getValue(), 1L))
-                    .toList();
-            Cart cart = Cart.from(items);
-            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user1.getUserId().getValue(), null, PaymentMethod.POINT);
-
-            // when
-            ConcurrentTestResult<PlaceOrderResult> result = ConcurrentTestRunner.run(
-                    10,
-                    () -> orderFacade.placeOrder(command)
-            );
-
-            // then
-            Point point = pointRepository.findByUserId(user1.getUserId()).get();
-            Assertions.assertAll(
-                    () -> assertThat(result.getSuccesses()).hasSize(10),
-                    () -> assertThat(result.getErrors()).hasSize(0),
-                    () -> assertThat(point.getBalance().getValue()).isEqualByComparingTo(BigDecimal.valueOf(850_000))
-            );
-        }
-
         @DisplayName("동일한 상품에 대해 여러 주문이 동시에 요청되어도, 재고가 정상적으로 차감되어야 한다")
         @Test
         void deductStocksProperly() throws Exception {

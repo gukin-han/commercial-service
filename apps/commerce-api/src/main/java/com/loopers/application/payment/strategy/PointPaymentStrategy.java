@@ -1,4 +1,4 @@
-package com.loopers.application.payment;
+package com.loopers.application.payment.strategy;
 
 import com.loopers.domain.payment.*;
 import com.loopers.common.error.CoreException;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class PointPaymentService implements PaymentStrategy {
+public class PointPaymentStrategy implements PaymentStrategy {
 
     private final PointRepository pointRepository;
     private final PaymentRepository paymentRepository;

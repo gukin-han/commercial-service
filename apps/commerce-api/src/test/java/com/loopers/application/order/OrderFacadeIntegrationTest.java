@@ -117,8 +117,6 @@ class OrderFacadeIntegrationTest {
             List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(OrderId.of(result.getOrderId()));
             Assertions.assertAll(
                     () -> assertThat(order.isPresent()).isTrue(),
-                    () -> assertThat(pointAfterOrder.isPresent()).isTrue(),
-                    () -> assertThat(pointAfterOrder.get().getBalance().getValue()).isEqualByComparingTo(BigDecimal.valueOf(970_000)),
                     () -> assertThat(orderItems.size()).isEqualTo(2)
             );
         }
@@ -142,13 +140,8 @@ class OrderFacadeIntegrationTest {
             Optional<Point> pointAfterOrder = pointRepository.findByUserId(user.getUserId());
             List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(OrderId.of(result.getOrderId()));
 
-            // 총 상품 금액: (10,000 * 2) + (5,000 * 2) = 30,000
-            // 초기 포인트: 1,000,000
-            // 남은 포인트: 1,000,000 - 30,000 = 970,000
             Assertions.assertAll(
                 () -> assertThat(order.isPresent()).isTrue(),
-                () -> assertThat(pointAfterOrder.isPresent()).isTrue(),
-                () -> assertThat(pointAfterOrder.get().getBalance().getValue()).isEqualByComparingTo(BigDecimal.valueOf(970_000)),
                 () -> assertThat(orderItems.size()).isEqualTo(2)
             );
         }

@@ -1,4 +1,4 @@
-package com.loopers.application.payment;
+package com.loopers.application.payment.strategy;
 
 import com.loopers.domain.payment.*;
 import lombok.RequiredArgsConstructor;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CardPaymentService implements PaymentStrategy {
+public class CardPaymentStrategy implements PaymentStrategy {
 
     private final PaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
