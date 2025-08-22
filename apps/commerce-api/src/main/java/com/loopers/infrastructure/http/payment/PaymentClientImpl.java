@@ -1,5 +1,6 @@
 package com.loopers.infrastructure.http.payment;
 
+import com.loopers.application.payment.Transaction;
 import com.loopers.domain.payment.PayCommand;
 import com.loopers.domain.payment.PayResult;
 import com.loopers.domain.payment.PaymentClient;
@@ -12,6 +13,8 @@ import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -54,5 +57,13 @@ public class PaymentClientImpl implements PaymentClient {
                         ? PayResult.FailureReason.UPSTREAM_FAILURE    // 재시도 불가 성격
                         : PayResult.FailureReason.NETWORK_ERROR       // 재시도 소진 or 네트워크류
         );
+    }
+
+    @Override
+    public List<Transaction> getTransactionByOrderId(Long orderId) {
+        HttpResponse<PaymentClientV1Dto.getResponse> response = paymentFeignClient.getTransactionsByOrderId(orderId);
+        return response.data().transactions().stream()
+                .map(Transaction::from)
+                .toList();
     }
 }

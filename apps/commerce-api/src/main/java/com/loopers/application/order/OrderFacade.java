@@ -20,12 +20,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderFacade {
 
-    private final PlatformTransactionManager tm;
-
     private final ProductService productService;
     private final OrderService orderService;
     private final CouponService couponService;
-    private final PaymentStrategyRouter paymentStrategyRouter;
 
     @Transactional
     public PlaceOrderResult placeOrder(PlaceOrderCommand command) {

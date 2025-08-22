@@ -3,6 +3,8 @@ package com.loopers.domain.payment;
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.product.Money;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +19,11 @@ import java.time.ZonedDateTime;
 public class Payment extends BaseEntity {
     private Long orderId;
     private Long userId;
+
+    @Enumerated(EnumType.STRING)
     private PaymentMethod method;
+
+    @Enumerated(EnumType.STRING)
     private PaymentStatus status;
     private String reason;
 

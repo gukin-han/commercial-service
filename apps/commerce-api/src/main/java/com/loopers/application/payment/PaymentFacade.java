@@ -9,15 +9,18 @@ import com.loopers.common.error.ErrorType;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderRepository;
 import com.loopers.domain.order.OrderService;
-import com.loopers.domain.payment.PayCommand;
-import com.loopers.domain.payment.PayResult;
-import com.loopers.domain.payment.Payment;
-import com.loopers.domain.payment.PaymentRepository;
+import com.loopers.domain.payment.*;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -29,10 +32,10 @@ public class PaymentFacade {
     private final PaymentStrategyRouter router;
     private final UserService userService;
     private final OrderService orderService;
+    private final PaymentClient paymentClient;
 
 
-
-//    @Transactional
+    //    @Transactional
     public PayResult initiatePayment(String loginId, InitiateCommand command) {
         User user = userService.getByLoginId(loginId);
         Order order = orderService.get(command.orderId());
@@ -52,11 +55,30 @@ public class PaymentFacade {
         return paymentStrategy.requestPayment(payCommand);
     }
 
-    public void syncPaymentCallbacks() {
+    public void syncPaymentCallbacks(Duration window) {
+        Instant cutoff = Instant.now().minus(window);
 
+        int page = 0;
+        int size = 100;
+
+        Page<Payment> slice = paymentRepository.findPendingSince(cutoff, PageRequest.of(page, size));
+        if (slice.isEmpty()) {
+            return;
+        }
+
+        slice.forEach(payment -> {
+            // 결제 상태 동기화
+            List<Transaction> transactions = paymentClient.getTransactionByOrderId(payment.getOrderId());
+
+            if (transactions.isEmpty()) {
+                return;
+            }
+
+            Transaction transaction = transactions.get(0); // 첫 번째 트랜잭션 사용
+            syncPaymentCallback(SyncPaymentCommand.of(payment.getOrderId(), transaction.getStatus(), transaction.getReason()));
+        });
     }
 
-    @Transactional
     public void syncPaymentCallback(SyncPaymentCommand command) {
         // 결제 상태 동기화 로직
         // 1. 주문 ID로 결제 정보 조회

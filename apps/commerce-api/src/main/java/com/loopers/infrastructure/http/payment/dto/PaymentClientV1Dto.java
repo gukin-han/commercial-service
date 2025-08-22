@@ -50,4 +50,17 @@ public class PaymentClientV1Dto {
             }
         }
     }
+
+    public record getResponse(Long orderId, List<Transaction> transactions) {
+        public record Transaction(
+                String transactionKey,
+                Status status,
+                String reason
+        ) {
+            public enum Status {
+                SUCCESS, FAILED
+            }
+        }
+
+    }
 }
