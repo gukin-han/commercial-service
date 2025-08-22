@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 public interface PaymentJpaRepository extends JpaRepository<Payment, Long> {
@@ -15,8 +15,8 @@ public interface PaymentJpaRepository extends JpaRepository<Payment, Long> {
 
     @Query("""
             select p from Payment p
-            where p.status = PaymentStatus.PENDING
+            where p.status = 'PENDING'
               and p.updatedAt >= :cutoff
             """)
-    Page<Payment> findPendingSince(@Param("cutoff")Instant cutoff, Pageable pageable);
+    Page<Payment> findPendingSince(@Param("cutoff") ZonedDateTime cutoff, Pageable pageable);
 }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Component
@@ -27,7 +28,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
-    public Page<Payment> findPendingSince(Instant cutoff, Pageable pageable) {
+    public Page<Payment> findPendingSince(ZonedDateTime cutoff, Pageable pageable) {
         return paymentJpaRepository.findPendingSince(cutoff, pageable);
     }
 }

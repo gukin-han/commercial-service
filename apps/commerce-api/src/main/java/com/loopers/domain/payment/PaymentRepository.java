@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 public interface PaymentRepository {
@@ -12,5 +13,5 @@ public interface PaymentRepository {
 
     Optional<Payment> findByOrderId(Long orderId);
 
-    Page<Payment> findPendingSince(Instant cutoff, Pageable pageable);
+    Page<Payment> findPendingSince(ZonedDateTime cutoff, Pageable pageable);
 }

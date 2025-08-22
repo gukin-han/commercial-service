@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Component
@@ -56,7 +57,7 @@ public class PaymentFacade {
     }
 
     public void syncPaymentCallbacks(Duration window) {
-        Instant cutoff = Instant.now().minus(window);
+        ZonedDateTime cutoff = ZonedDateTime.now().minus(window);
 
         int page = 0;
         int size = 100;
