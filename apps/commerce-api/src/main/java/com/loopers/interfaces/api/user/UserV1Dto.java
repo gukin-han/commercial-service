@@ -8,16 +8,16 @@ public class UserV1Dto {
     public record UserResponse(String email, String userId, String dateOfBirth) {
 
         public static UserResponse fromEntity(User user) {
-            return new UserResponse(user.getEmail(), user.getUserId(), user.getDateOfBirth());
+            return new UserResponse(user.getEmail(), user.getLoginId(), user.getDateOfBirth());
         }
     }
 
-    public record RegisterRequest(String email, String userId, String birthday, Gender gender) {
+    public record RegisterRequest(String email, String loginId, String birthday, Gender gender) {
 
         public static User toEntity(RegisterRequest request) {
             return User.builder()
                     .email(request.email)
-                    .userId(request.userId)
+                    .loginId(request.loginId)
                     .dateOfBirth(request.birthday)
                     .gender(request.gender)
                     .build();

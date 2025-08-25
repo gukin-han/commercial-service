@@ -2,7 +2,7 @@ package com.loopers.domain.point;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.loopers.application.PointFacade;
+import com.loopers.application.point.PointFacade;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -38,23 +38,23 @@ class PointServiceIntegrationTest {
      * - [x]  해당 ID 의 회원이 존재할 경우, 보유 포인트가 반환된다.
      * - [x]  해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.
      */
-    @DisplayName("userId로 포인트 조회 시")
+    @DisplayName("loginId로 포인트 조회 시")
     @Nested
-    class GetPointsByUserId {
+    class GetPointsByLoginId {
 
         @DisplayName("해당 ID 의 회원이 존재할 경우, 보유 포인트가 반환된다.")
         @Test
         void returnsPoints_whenUserExist() {
             //given
-            String userId = "gukin";
+            String loginId = "gukin";
             Point point = Point.builder()
-                    .userId(userId)
+                    .loginId(loginId)
                     .balance(1000L)
                     .build();
             pointRepository.save(point);
 
             //when
-            Point result = pointFacade.getPointByUserId(userId);
+            Point result = pointFacade.getPointByUserId(loginId);
 
             //then
             Assertions.assertAll(
