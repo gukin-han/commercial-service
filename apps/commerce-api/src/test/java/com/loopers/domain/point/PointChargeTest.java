@@ -3,6 +3,7 @@ package com.loopers.domain.point;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.loopers.domain.product.Money;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +29,7 @@ class PointChargeTest {
             String userId = "gukin";
 
             //when
-            CoreException result = assertThrows(CoreException.class, () -> new PointCharge(amount));
+            CoreException result = assertThrows(CoreException.class, () -> new PointCharge(Money.of(amount)));
 
             //then
             Assertions.assertAll(

@@ -1,8 +1,11 @@
 package com.loopers.domain.product;
 
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -15,11 +18,8 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     public Product findByProductId(ProductId productId) {
-        return productRepository.findById(productId.getValue()).orElseThrow(EntityNotFoundException::new);
-    }
-
-    public List<Product> findAllByIds(List<ProductId> productIds) {
-        return productRepository.findAllByIds(productIds.stream().map(ProductId::getValue).collect(Collectors.toList()));
+        return productRepository.findById(productId.getValue())
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "조회할 수 없는 상품입니다."));
     }
 
     public Product save(Product product) {
@@ -27,10 +27,12 @@ public class ProductService {
     }
 
     public List<Product> getAllByIdsIn(List<ProductId> productIds) {
-        List<Product> products = productRepository.findAllByIds(productIds.stream()
+        List<Long> sortedProductIds = productIds.stream()
                 .map(ProductId::getValue)
-                .toList()
-        );
+                .sorted()
+                .toList();
+
+        List<Product> products = productRepository.findAllByIdsWithPessimisticLock(sortedProductIds);
 
         if (products.size() != productIds.size()) {
             throw new IllegalArgumentException("조회결과, 존재하지 않는 상품이 있습니다.");
@@ -50,12 +52,12 @@ public class ProductService {
         product.decreaseStock(stock.getQuantity());
     }
 
-    public long calculateTotalPrice(List<Product> products, Map<ProductId, Stock> productIdToStockMap) {
-        long totalPrice = 0;
+    public Money calculateTotalPrice(List<Product> products, Map<ProductId, Stock> productIdToStockMap) {
+        Money totalPrice = Money.of(0L);
         for (Product product : products) {
             Money unitPrice = product.getPrice();
-            Stock stock = productIdToStockMap.get(product);
-            totalPrice += stock.getQuantity() + unitPrice.getValue();
+            Stock stock = productIdToStockMap.get(product.getProductId());
+            totalPrice = totalPrice.add(unitPrice.multiply(stock.getQuantity()));
         }
         return totalPrice;
     }

@@ -25,8 +25,11 @@ public class PagedResult<T> {
 
     // 정적 팩토리 메서드: 페이지네이션 계산 로직을 캡슐화
     public static <T> PagedResult<T> of(List<T> items, int currentPage, long totalItems, int pageSize) {
-        int totalPages = (int) ((totalItems - 1) / pageSize) + 1;
-        boolean hasNext = currentPage < totalPages;
+        if (pageSize <= 0) {
+            throw new IllegalArgumentException("pageSize must be greater than 0");
+        }
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+        boolean hasNext = currentPage < totalPages - 1;
 
         return PagedResult.<T>builder()
                 .items(items)

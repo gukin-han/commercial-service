@@ -1,23 +1,27 @@
 package com.loopers.application.product.dto;
 
+import com.loopers.interfaces.api.product.ProductV1Dto;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 public class ProductDetailQuery {
     private final Long productId;
-    private final Long brandId;
 
     @Builder
-    private ProductDetailQuery(Long productId, Long brandId) {
+    private ProductDetailQuery(Long productId) {
         this.productId = productId;
-        this.brandId = brandId;
     }
 
-    public static ProductDetailQuery of(Long productId, Long brandId) {
+    public static ProductDetailQuery of(Long productId) {
         return ProductDetailQuery.builder()
                 .productId(productId)
-                .brandId(brandId)
+                .build();
+    }
+
+    public static ProductDetailQuery from(ProductV1Dto.GetProductByIdRequest request) {
+        return ProductDetailQuery.builder()
+                .productId(request.getProductId())
                 .build();
     }
 }

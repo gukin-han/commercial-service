@@ -3,6 +3,7 @@ package com.loopers.interfaces.api.point;
 import com.loopers.application.point.PointFacade;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointCharge;
+import com.loopers.interfaces.api.ApiHeader;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.point.PointV1Dto.PointResponse;
 import com.loopers.support.error.CoreException;
@@ -24,12 +25,14 @@ public class PointV1Controller implements PointV1ApiSpec {
 
     @Override
     @GetMapping
-    public ApiResponse<PointResponse> get(@RequestHeader("X-USER-ID") String userId) {
-
-        if (userId == null || userId.isBlank()) {
+    public ApiResponse<PointResponse> get(
+            @RequestHeader(ApiHeader.LOGIN_ID) String loginId
+    ) {
+        if (loginId == null || loginId.isBlank()) {
             throw new CoreException(ErrorType.BAD_REQUEST);
         }
-        Point point = pointFacade.getPointByUserId(userId);
+
+        Point point = pointFacade.getPointByUserId(loginId);
         PointV1Dto.PointResponse response = PointResponse.fromEntity(point);
         return ApiResponse.success(response);
     }
@@ -37,13 +40,12 @@ public class PointV1Controller implements PointV1ApiSpec {
     @Override
     @PostMapping("/charge")
     public ApiResponse<PointV1Dto.PointResponse> charge(
-            @RequestHeader("X-USER-ID") String userId, @RequestBody PointV1Dto.ChargeRequest request) {
-
+            @RequestHeader(ApiHeader.LOGIN_ID) String userId,
+            @RequestBody PointV1Dto.ChargeRequest request
+    ) {
         PointCharge pointCharge = request.toVo();
-        Point chargedPoint = pointFacade.chargePoint(userId, pointCharge);
+        Point chargedPoint = pointFacade.chargePoint(userId, pointCharge.getAmount());
 
         return ApiResponse.success(PointV1Dto.PointResponse.fromEntity(chargedPoint));
     }
-
-
 }

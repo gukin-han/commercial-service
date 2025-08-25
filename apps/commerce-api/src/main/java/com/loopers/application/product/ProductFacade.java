@@ -32,7 +32,7 @@ public class ProductFacade {
     @Transactional(readOnly = true)
     public ProductDetailView getProductDetail(ProductDetailQuery query) {
         Product product = productService.findByProductId(ProductId.of(query.getProductId()));
-        Brand brand = brandService.findByBrandId(BrandId.of(query.getBrandId()));
+        Brand brand = brandService.findByBrandId(product.getBrandId());
 
         return ProductDetailView.create(product, brand);
     }
@@ -60,7 +60,6 @@ public class ProductFacade {
         return products.stream()
                 .map(p -> {
                     Brand b = brandMap.get(p.getBrandId());
-                    System.out.println(b);
                     return ProductSummaryView.of(p, b);
                 })
                 .toList();
