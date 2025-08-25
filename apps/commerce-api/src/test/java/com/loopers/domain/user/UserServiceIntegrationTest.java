@@ -44,7 +44,7 @@ class UserServiceIntegrationTest {
         void savesUserEntity_whenSignUpSuccessfully() {
             //given
             User user = User.builder()
-                    .userId("gukin")
+                    .loginId("gukin")
                     .email("gukin@gmail.com")
                     .dateOfBirth("2025-07-15")
                     .gender(Gender.FEMALE)
@@ -54,9 +54,9 @@ class UserServiceIntegrationTest {
             userService.signUp(user);
 
             //then
-            User savedUser = userRepository.findByUserId("gukin").get();
+            User savedUser = userRepository.findByLoginId("gukin").get();
             assertAll(
-                    () -> assertThat(savedUser.getUserId()).isEqualTo(user.getUserId()),
+                    () -> assertThat(savedUser.getLoginId()).isEqualTo(user.getLoginId()),
                     () -> assertThat(savedUser.getEmail()).isEqualTo(user.getEmail()),
                     () -> assertThat(savedUser.getDateOfBirth()).isEqualTo(user.getDateOfBirth()),
                     () -> assertThat(savedUser.getGender()).isEqualTo(user.getGender()));
@@ -67,7 +67,7 @@ class UserServiceIntegrationTest {
         void throwsBadRequestException_whenSignUpWithExistingUserId() {
             //given
             User user = User.builder()
-                    .userId("gukin")
+                    .loginId("gukin")
                     .email("gukin@gmail.com")
                     .dateOfBirth("2025-07-15")
                     .gender(Gender.FEMALE)
@@ -94,7 +94,7 @@ class UserServiceIntegrationTest {
         void returnsUserEntity_whenUserExists() {
             //given
             User user = User.builder()
-                    .userId("gukin")
+                    .loginId("gukin")
                     .email("gukin@gmail.com")
                     .dateOfBirth("2025-07-15")
                     .gender(Gender.FEMALE)
@@ -102,11 +102,11 @@ class UserServiceIntegrationTest {
             userService.signUp(user);
 
             //when
-            User result = userService.getMe(user.getUserId());
+            User result = userService.getMe(user.getLoginId());
 
             //then
             assertAll(
-                    () -> assertThat(result.getUserId()).isEqualTo(user.getUserId()),
+                    () -> assertThat(result.getLoginId()).isEqualTo(user.getLoginId()),
                     () -> assertThat(result.getEmail()).isEqualTo(user.getEmail()),
                     () -> assertThat(result.getDateOfBirth()).isEqualTo(user.getDateOfBirth()),
                     () -> assertThat(result.getGender()).isEqualTo(user.getGender()));

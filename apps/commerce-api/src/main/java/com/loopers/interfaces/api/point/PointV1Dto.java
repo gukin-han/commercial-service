@@ -15,7 +15,7 @@ public class PointV1Dto {
 
     public record PointResponse(String userId, long balance) {
         public static PointV1Dto.PointResponse fromEntity(Point point) {
-            return new PointV1Dto.PointResponse(point.getUserId(), point.getBalance());
+            return new PointV1Dto.PointResponse(point.getLoginId(), point.getBalance());
         }
     }
 }

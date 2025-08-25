@@ -1,7 +1,8 @@
-package com.loopers.application;
+package com.loopers.application.point;
 
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointCharge;
+import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.point.PointService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PointFacade {
 
     private final PointService pointService;
+    private final PointRepository pointRepository;
 
     @Transactional(readOnly = true)
     public Point getPointByUserId(String userId) {
@@ -30,7 +32,7 @@ public class PointFacade {
         }
 
         point.add(pointCharge.getAmount());
-        return pointService.save(point);
+        return pointRepository.save(point);
     }
 
 }

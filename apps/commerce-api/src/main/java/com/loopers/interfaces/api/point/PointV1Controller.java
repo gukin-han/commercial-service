@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api.point;
 
-import com.loopers.application.PointFacade;
+import com.loopers.application.point.PointFacade;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointCharge;
 import com.loopers.interfaces.api.ApiResponse;
