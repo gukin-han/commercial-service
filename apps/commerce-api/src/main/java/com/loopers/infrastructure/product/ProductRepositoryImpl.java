@@ -1,18 +1,21 @@
 package com.loopers.infrastructure.product;
 
 import com.loopers.application.product.dto.ProductSortType;
+import com.loopers.domain.brand.BrandId;
+import com.loopers.domain.product.ProductDetail;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
+import static com.loopers.domain.brand.QBrand.brand;
 import static com.loopers.domain.product.QProduct.product;
 
 
@@ -30,17 +33,37 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public List<Product> findProducts(int page, int size, ProductSortType productSortType) {
-        return jpaQueryFactory.selectFrom(product)
+    public List<ProductDetail> findPagedProductDetails(BrandId brandId, int page, int size, ProductSortType productSortType) {
+        return jpaQueryFactory
+                .select(Projections.constructor(ProductDetail.class,
+                        product.id,
+                        product.name,
+                        product.price,
+                        product.stock,
+                        product.likeCount,
+                        brand.id,
+                        brand.name
+                ))
+                .from(product)
+                .innerJoin(brand).on(product.brandId.value.eq(brand.id))
+                .where(brandEq(brandId))
                 .orderBy(productSort(productSortType))
                 .offset((long) page * size)
                 .limit(size)
                 .fetch();
     }
 
+    private BooleanExpression brandEq(BrandId brandId) {
+        return brandId == null ? null : product.brandId.eq(brandId);
+    }
+
     @Override
-    public long getTotalCount() {
-        return productJpaRepository.count();
+    public long getTotalCountByBrandId(BrandId brandId) {
+        if (brandId == null) {
+            return productJpaRepository.count();
+        } else {
+            return productJpaRepository.countByBrandId(brandId);
+        }
     }
 
     @Override
@@ -70,11 +93,14 @@ public class ProductRepositoryImpl implements ProductRepository {
         return productJpaRepository.decrementLikeCount(productId) > 0;
     }
 
-    private OrderSpecifier<?> productSort(ProductSortType productSortType) {
-        return switch (productSortType) {
-            case LATEST -> product.createdAt.desc();
-            case PRICE_ASC -> product.price.value.asc();
-            case LIKES_DESC -> product.likeCount.desc();
+    private OrderSpecifier<?>[] productSort(ProductSortType s) {
+        return switch (s) {
+            case LATEST ->
+                    new OrderSpecifier<?>[]{ product.createdAt.desc(), product.id.desc() };
+            case PRICE_ASC ->
+                    new OrderSpecifier<?>[]{ product.price.value.asc(), product.id.asc() };
+            case LIKES_DESC ->
+                    new OrderSpecifier<?>[]{ product.likeCount.desc(), product.id.desc() };
         };
     }
 }
