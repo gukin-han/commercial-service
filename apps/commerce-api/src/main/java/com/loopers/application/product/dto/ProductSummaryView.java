@@ -45,6 +45,7 @@ public class ProductSummaryView {
 
     public static ProductSummaryView of(Product product, Brand brand) {
         return ProductSummaryView.builder()
+                .productId(product.getProductId())
                 .stock(product.getStock())
                 .likeCount(product.getLikeCount())
                 .status(product.getStatus())

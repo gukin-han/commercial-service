@@ -2,7 +2,11 @@ package com.loopers.infrastructure.like;
 
 import com.loopers.domain.like.ProductLike;
 import com.loopers.domain.like.ProductLikeRepository;
+import com.loopers.domain.product.ProductId;
+import com.loopers.domain.user.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -19,17 +23,18 @@ public class ProductLikeRepositoryImpl implements ProductLikeRepository {
     }
 
     @Override
-    public Optional<ProductLike> findByUserIdAndProductId(Long userId, Long productId) {
+    public Optional<ProductLike> findByUserIdAndProductId(UserId userId, ProductId productId) {
         return productLikeJpaRepository.findByUserIdAndProductId(userId, productId);
     }
 
     @Override
-    public void delete(ProductLike productLike) {
-        productLikeJpaRepository.delete(productLike);
+    public boolean insertIgnoreDuplicateKey(UserId userId, ProductId productId) {
+        return productLikeJpaRepository.insertIgnoreDuplicateKey(userId.getValue(), productId.getValue()) > 0;
     }
 
     @Override
-    public boolean existsByUserIdAndProductId(Long userId, Long productId) {
-        return productLikeJpaRepository.existsByUserIdAndProductId(userId, productId);
+    public boolean deleteByProductIdAndUserId(UserId userId, ProductId productId) {
+        return productLikeJpaRepository.deleteByProductIdAndUserId(productId, userId) > 0;
     }
+
 }

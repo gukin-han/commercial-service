@@ -3,6 +3,7 @@ package com.loopers.domain.point;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.loopers.application.point.PointFacade;
+import com.loopers.domain.product.Money;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -49,7 +50,7 @@ class PointServiceIntegrationTest {
             String loginId = "gukin";
             Point point = Point.builder()
                     .loginId(loginId)
-                    .balance(1000L)
+                    .balance(Money.of(1000L))
                     .build();
             pointRepository.save(point);
 
@@ -59,7 +60,10 @@ class PointServiceIntegrationTest {
             //then
             Assertions.assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result.getBalance()).isEqualTo(1000L)
+                    () -> assertThat(result.getBalance()
+                            .getValue()
+                            .compareTo(Money.of(1000L).getValue()))
+                            .isEqualTo(0)
             );
         }
 
@@ -89,10 +93,10 @@ class PointServiceIntegrationTest {
         void fails_whenUserIdDoesNotExist() {
             //given
             String userId = "gukin";
-            PointCharge pointCharge = new PointCharge(1000L);// 충전 금액은 1000원으로 설정
+            Money amount = Money.of(1000L);
 
             //when
-            CoreException exception = Assertions.assertThrows(CoreException.class, () -> pointFacade.chargePoint(userId, pointCharge));
+            CoreException exception = Assertions.assertThrows(CoreException.class, () -> pointFacade.chargePoint(userId, amount));
 
             //then
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);

@@ -1,5 +1,6 @@
 package com.loopers.domain.point;
 
+import com.loopers.domain.product.Money;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.Getter;
@@ -7,11 +8,11 @@ import lombok.Getter;
 @Getter
 public class PointCharge {
 
-    private final long amount;
+    private final Money amount;
 
-    public PointCharge(long amount) {
+    public PointCharge(Money amount) {
 
-        if (amount <= 0) {
+        if (!amount.isPositive()) {
             throw new CoreException(ErrorType.BAD_REQUEST, "충전 금액은 0보다 커야 합니다.");
         }
 

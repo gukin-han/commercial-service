@@ -51,6 +51,17 @@ public class Product extends BaseEntity {
         this.status = ProductStatus.ACTIVE;
     }
 
+    public static Product create(Stock stock, String name, Money price, BrandId brandId) {
+        return Product.builder()
+                .stock(stock)
+                .name(name)
+                .price(price)
+                .brandId(brandId)
+                .likeCount(0)
+                .status(ProductStatus.ACTIVE)
+                .build();
+    }
+
     public void decreaseStock(long quantity) {
 
         this.canDecrease();
