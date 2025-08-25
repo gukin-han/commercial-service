@@ -10,7 +10,7 @@ import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandId;
 import com.loopers.domain.brand.BrandService;
 import com.loopers.domain.product.*;
-import com.loopers.support.cache.CacheRepository;
+import com.loopers.common.cache.CacheRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

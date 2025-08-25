@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -86,18 +87,12 @@ public class Coupon extends BaseEntity {
         return getId() == null ? null : CouponId.of(getId());
     }
 
-    public void use(Order order) {
-        this.orderId = order.getOrderId();
+    public void use() {
         this.status = CouponStatus.USED;
     }
 
-    public void cancelUse() {
-        this.orderId = null;
-        this.status = CouponStatus.AVAILABLE;
-    }
-
     public boolean isUsed() {
-        return this.orderId != null;
+        return this.status == CouponStatus.USED;
     }
 
 }

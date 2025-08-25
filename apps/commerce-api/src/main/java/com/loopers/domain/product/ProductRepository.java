@@ -22,4 +22,6 @@ public interface ProductRepository {
     boolean incrementLikeCount(Long productId);
 
     boolean decrementLikeCount(Long productId);
+
+    List<Product> findAllById(List<Long> productIds);
 }

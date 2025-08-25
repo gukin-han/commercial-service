@@ -1,7 +1,7 @@
 package com.loopers.application.user.dto;
 
 import com.loopers.domain.user.User;
-import com.loopers.support.constant.Gender;
+import com.loopers.common.constant.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -3,7 +3,7 @@ package com.loopers.interfaces.api.user;
 import com.loopers.application.user.dto.SignUpCommand;
 import com.loopers.application.user.dto.SignUpResult;
 import com.loopers.application.user.dto.UserInfoView;
-import com.loopers.support.constant.Gender;
+import com.loopers.common.constant.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -2,8 +2,8 @@ package com.loopers.domain.product;
 
 import com.loopers.application.product.dto.ProductSortType;
 import com.loopers.domain.brand.BrandId;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
+import com.loopers.common.error.CoreException;
+import com.loopers.common.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +17,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    @Transactional(readOnly = true)
     public Product findByProductId(ProductId productId) {
         return productRepository.findById(productId.getValue())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "조회할 수 없는 상품입니다."));
@@ -31,33 +32,32 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public List<Product> getAllByIdsIn(List<ProductId> productIds) {
-        List<Long> sortedProductIds = productIds.stream()
+    @Transactional
+    public void deductStocks(Map<ProductId, Stock> productIdToStockMap) {
+        List<Long> productIds = productIdToStockMap.keySet().stream()
                 .map(ProductId::getValue)
-                .sorted()
                 .toList();
 
-        List<Product> products = productRepository.findAllByIdsWithPessimisticLock(sortedProductIds);
+        List<Product> products = productRepository.findAllByIdsWithPessimisticLock(productIds);
 
         if (products.size() != productIds.size()) {
             throw new IllegalArgumentException("조회결과, 존재하지 않는 상품이 있습니다.");
         }
-        return products;
-    }
 
-    public void deductStocks(List<Product> products, Map<ProductId, Stock> productIdToStockMap) {
         for (Product product : products) {
             ProductId productId = product.getProductId();
             Stock stock = productIdToStockMap.get(productId);
-            this.deductStock(product, stock);
+            product.decreaseStock(stock.getQuantity());
         }
     }
 
-    private void deductStock(Product product, Stock stock) {
-        product.decreaseStock(stock.getQuantity());
-    }
+    @Transactional(readOnly = true)
+    public Money calculateTotalPrice(Map<ProductId, Stock> productIdToStockMap) {
+        List<Long> productIds = productIdToStockMap.keySet().stream()
+                .map(ProductId::getValue)
+                .toList();
+        List<Product> products = productRepository.findAllById(productIds);
 
-    public Money calculateTotalPrice(List<Product> products, Map<ProductId, Stock> productIdToStockMap) {
         Money totalPrice = Money.of(0L);
         for (Product product : products) {
             Money unitPrice = product.getPrice();

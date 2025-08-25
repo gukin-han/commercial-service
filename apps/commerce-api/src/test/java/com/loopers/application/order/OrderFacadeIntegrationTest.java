@@ -9,10 +9,9 @@ import com.loopers.domain.coupon.Coupon;
 import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.coupon.CouponType;
 import com.loopers.domain.coupon.Percent;
+import com.loopers.domain.order.*;
 import com.loopers.domain.order.Order;
-import com.loopers.domain.order.OrderItem;
-import com.loopers.domain.order.OrderItemRepository;
-import com.loopers.domain.order.OrderRepository;
+import com.loopers.domain.payment.PaymentMethod;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.Money;
@@ -21,7 +20,7 @@ import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.product.Stock;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.support.constant.Gender;
+import com.loopers.common.constant.Gender;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,19 +106,17 @@ class OrderFacadeIntegrationTest {
                 items.add(CartItem.of(p.getProductId().getValue(), 2L));
             }
             Cart cart = Cart.from(items);
-            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), coupon.getCouponId().getValue());
+            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), coupon.getCouponId().getValue(), PaymentMethod.POINT);
 
             //when
             PlaceOrderResult result = orderFacade.placeOrder(command);
 
             //then
-            Optional<Order> order = orderRepository.findByOrderId(result.getOrderId());
+            Optional<Order> order = orderRepository.findByOrderId(OrderId.of(result.getOrderId()));
             Optional<Point> pointAfterOrder = pointRepository.findByUserId(user.getUserId());
-            List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(result.getOrderId());
+            List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(OrderId.of(result.getOrderId()));
             Assertions.assertAll(
                     () -> assertThat(order.isPresent()).isTrue(),
-                    () -> assertThat(pointAfterOrder.isPresent()).isTrue(),
-                    () -> assertThat(pointAfterOrder.get().getBalance().getValue()).isEqualByComparingTo(BigDecimal.valueOf(976_000)),
                     () -> assertThat(orderItems.size()).isEqualTo(2)
             );
         }
@@ -133,23 +130,18 @@ class OrderFacadeIntegrationTest {
                     .toList();
             Cart cart = Cart.from(items);
             // command에 couponId로 null을 전달
-            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), null);
+            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), null, PaymentMethod.POINT);
 
             //when
             PlaceOrderResult result = orderFacade.placeOrder(command);
 
             //then
-            Optional<Order> order = orderRepository.findByOrderId(result.getOrderId());
+            Optional<Order> order = orderRepository.findByOrderId(OrderId.of(result.getOrderId()));
             Optional<Point> pointAfterOrder = pointRepository.findByUserId(user.getUserId());
-            List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(result.getOrderId());
+            List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(OrderId.of(result.getOrderId()));
 
-            // 총 상품 금액: (10,000 * 2) + (5,000 * 2) = 30,000
-            // 초기 포인트: 1,000,000
-            // 남은 포인트: 1,000,000 - 30,000 = 970,000
             Assertions.assertAll(
                 () -> assertThat(order.isPresent()).isTrue(),
-                () -> assertThat(pointAfterOrder.isPresent()).isTrue(),
-                () -> assertThat(pointAfterOrder.get().getBalance().getValue()).isEqualByComparingTo(BigDecimal.valueOf(970_000)),
                 () -> assertThat(orderItems.size()).isEqualTo(2)
             );
         }
@@ -166,7 +158,7 @@ class OrderFacadeIntegrationTest {
                     .map(p -> CartItem.of(p.getProductId().getValue(), 1L))
                     .toList();
             Cart cart = Cart.from(items);
-            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), coupon.getCouponId().getValue());
+            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user.getUserId().getValue(), coupon.getCouponId().getValue(), PaymentMethod.POINT);
 
             // 동시 시작/종료 장치
             CyclicBarrier start = new CyclicBarrier(threadCount);
@@ -191,9 +183,10 @@ class OrderFacadeIntegrationTest {
             done.await();
             pool.shutdown();
 
-            assertThat(successes).hasSize(1);
-            assertThat(errors).hasSize(9);
-            assertThat(errors.get(0)).isInstanceOf(ObjectOptimisticLockingFailureException.class);
+            Assertions.assertAll(
+                    () -> assertThat(successes).hasSize(1),
+                    () -> assertThat(errors).hasSize(9)
+            );
         }
     }
 }

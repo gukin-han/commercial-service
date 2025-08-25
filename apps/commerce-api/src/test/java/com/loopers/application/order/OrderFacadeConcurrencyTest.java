@@ -9,6 +9,7 @@ import com.loopers.domain.coupon.Coupon;
 import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.coupon.CouponType;
 import com.loopers.domain.coupon.Percent;
+import com.loopers.domain.payment.PaymentMethod;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.Money;
@@ -19,7 +20,7 @@ import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.testhelper.ConcurrentTestResult;
 import com.loopers.testhelper.ConcurrentTestRunner;
-import com.loopers.support.constant.Gender;
+import com.loopers.common.constant.Gender;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +100,7 @@ public class OrderFacadeConcurrencyTest {
                     .map(p -> CartItem.of(p.getProductId().getValue(), 1L))
                     .toList();
             Cart cart = Cart.from(items);
-            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user1.getUserId().getValue(), coupon.getCouponId().getValue());
+            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user1.getUserId().getValue(), coupon.getCouponId().getValue(), PaymentMethod.POINT);
 
             // when
             ConcurrentTestResult<PlaceOrderResult> result = ConcurrentTestRunner.run(
@@ -110,32 +111,6 @@ public class OrderFacadeConcurrencyTest {
             // then
             assertThat(result.getSuccesses()).hasSize(1);
             assertThat(result.getErrors()).hasSize(9);
-            assertThat(result.getErrors().get(0)).isInstanceOf(ObjectOptimisticLockingFailureException.class);
-        }
-
-        @DisplayName("동일한 유저가 서로 다른 주문을 동시에 수행해도, 포인트가 정상적으로 차감되어야 한다.")
-        @Test
-        void deductPointsProperly() throws Exception {
-            // given
-            List<CartItem> items = savedProducts.stream()
-                    .map(p -> CartItem.of(p.getProductId().getValue(), 1L))
-                    .toList();
-            Cart cart = Cart.from(items);
-            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user1.getUserId().getValue(), null);
-
-            // when
-            ConcurrentTestResult<PlaceOrderResult> result = ConcurrentTestRunner.run(
-                    10,
-                    () -> orderFacade.placeOrder(command)
-            );
-
-            // then
-            Point point = pointRepository.findByUserId(user1.getUserId()).get();
-            Assertions.assertAll(
-                    () -> assertThat(result.getSuccesses()).hasSize(10),
-                    () -> assertThat(result.getErrors()).hasSize(0),
-                    () -> assertThat(point.getBalance().getValue()).isEqualByComparingTo(BigDecimal.valueOf(850_000))
-            );
         }
 
         @DisplayName("동일한 상품에 대해 여러 주문이 동시에 요청되어도, 재고가 정상적으로 차감되어야 한다")
@@ -146,7 +121,7 @@ public class OrderFacadeConcurrencyTest {
                     .map(p -> CartItem.of(p.getProductId().getValue(), 1L))
                     .toList();
             Cart cart = Cart.from(items);
-            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user1.getUserId().getValue(), null);
+            PlaceOrderCommand command = PlaceOrderCommand.of(cart, user1.getUserId().getValue(), null, PaymentMethod.POINT);
 
             // when
             ConcurrentTestResult<PlaceOrderResult> result = ConcurrentTestRunner.run(
