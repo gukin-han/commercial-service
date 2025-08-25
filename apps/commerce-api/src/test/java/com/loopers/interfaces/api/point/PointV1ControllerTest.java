@@ -7,7 +7,7 @@ import com.loopers.interfaces.api.ApiHeader;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.point.PointV1Dto.PointResponse;
 import com.loopers.interfaces.api.user.UserV1Dto;
-import com.loopers.support.constant.Gender;
+import com.loopers.common.constant.Gender;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

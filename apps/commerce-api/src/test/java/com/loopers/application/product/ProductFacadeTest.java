@@ -7,11 +7,13 @@ import com.loopers.domain.brand.BrandId;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.product.*;
 import com.loopers.utils.DatabaseCleanUp;
+import com.loopers.utils.RedisCleanUp;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 class ProductFacadeTest {
@@ -25,11 +27,17 @@ class ProductFacadeTest {
     @Autowired
     ProductFacade productFacade;
 
+
     @Autowired
-    DatabaseCleanUp databaseCleanUp;
+    private DatabaseCleanUp databaseCleanUp;
+
+    @Autowired
+    private RedisCleanUp redisCleanUp;
+
     @AfterEach
     void tearDown() {
         databaseCleanUp.truncateAllTables();
+        redisCleanUp.truncateAll();
     }
 
     @DisplayName("상품 상세 조회 시")

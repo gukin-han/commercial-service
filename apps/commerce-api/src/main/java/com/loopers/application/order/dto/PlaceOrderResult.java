@@ -9,20 +9,20 @@ import lombok.Data;
 public class PlaceOrderResult {
 
     private Status status;
-    private OrderId orderId;
+    private Long orderId;
     private final String message;
 
     @Builder
-    private PlaceOrderResult(Status status, OrderId orderId, String message) {
+    private PlaceOrderResult(Status status, Long orderId, String message) {
         this.status = status;
         this.message = message;
         this.orderId = orderId;
     }
 
-    public static PlaceOrderResult success(Order order) {
+    public static PlaceOrderResult success(OrderId orderId) {
         return PlaceOrderResult.builder()
                 .status(Status.SUCCESS)
-                .orderId(order.getOrderId())
+                .orderId(orderId.getValue())
                 .message("")
                 .build();
     }

@@ -2,9 +2,8 @@ package com.loopers.application.product;
 
 import com.loopers.domain.product.ProductId;
 import com.loopers.domain.product.ProductService;
-import com.loopers.support.error.CoreException;
+import com.loopers.common.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
-import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

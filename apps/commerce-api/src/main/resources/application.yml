@@ -22,17 +22,62 @@ spring:
       - jpa.yml
       - logging.yml
       - monitoring.yml
+      - redis.yml
+
 
 springdoc:
   use-fqn: true
   swagger-ui:
     path: /swagger-ui.html
 
+resilience4j:
+  circuitbreaker:
+    circuitBreakerAspectOrder: 1
+  retry:
+    retryAspectOrder: 2
+
+resilience4j.circuitbreaker:
+  instances:
+    pgCircuit:
+      sliding-window-size: 10
+      failure-rate-threshold: 50       # 실패율이 50% 넘으면 Open
+      wait-duration-in-open-state: 10s # Open 상태 유지 시간
+      permitted-number-of-calls-in-half-open-state: 2
+      slow-call-duration-threshold: 2s
+      slow-call-rate-threshold: 50
+
+resilience4j.retry:
+  instances:
+    pgRetry:
+      maxAttempts: 2
+      waitDuration: 1s
+#      enableExponentialBackoff: true
+#      exponentialBackoffMultiplier: 2
+      retryExceptions:
+        - com.loopers.infrastructure.http.payment.error.PgTransientException
+        - feign.RetryableException         # 진짜 네트워크 실패도 재시도
+      ignoreExceptions:
+        - com.loopers.infrastructure.http.payment.error.PgBusinessException
+      fail-after-max-attempts: true
+
+
+
 ---
 spring:
   config:
     activate:
       on-profile: local, test
+
+
+resilience4j.circuitbreaker:
+  instances:
+    pgCircuit:
+      sliding-window-size: 6
+      failure-rate-threshold: 50       # 실패율이 50% 넘으면 Open
+      wait-duration-in-open-state: 200ms # Open 상태 유지 시간
+      permitted-number-of-calls-in-half-open-state: 2
+      slow-call-duration-threshold: 20ms
+      slow-call-rate-threshold: 50
 
 ---
 spring:
