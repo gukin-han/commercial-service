@@ -5,7 +5,6 @@ import com.loopers.common.error.CoreException;
 import com.loopers.common.error.ErrorType;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
-import com.loopers.domain.user.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,7 @@ public class PointPaymentAdapter implements PaymentStrategy {
     @Transactional
     public PayResult requestPayment(PayCommand command) {
         // 포인트 조회할 수 없는 경우는 예외발생
-        Point point = pointRepository.findByUserIdForUpdate(UserId.of(command.getUserId()))
+        Point point = pointRepository.findByUserIdForUpdate(command.getUserId())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "포인트를 조회할 수 없습니다. userId : " + command.getUserId()));
 
         // 결제 정보 먼저 생성

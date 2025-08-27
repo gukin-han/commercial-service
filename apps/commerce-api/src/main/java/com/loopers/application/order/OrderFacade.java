@@ -1,18 +1,14 @@
 package com.loopers.application.order;
 
-import com.loopers.application.payment.strategy.PaymentStrategyRouter;
 import com.loopers.domain.coupon.CouponService;
-import com.loopers.application.order.dto.Cart;
-import com.loopers.application.order.dto.PlaceOrderCommand;
-import com.loopers.application.order.dto.PlaceOrderResult;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.product.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -25,28 +21,28 @@ public class OrderFacade {
     private final CouponService couponService;
 
     @Transactional
-    public PlaceOrderResult placeOrder(PlaceOrderCommand command) {
-        Map<ProductId, Stock> productIdToStockMap = this.getProductIdStockMap(command.getCart());
+    public OrderResult.Create create(OrderCommand.Create command) {
+        Map<Long, Stock> productIdToStockMap = this.getProductIdStockMap(command.items());
 
         // 1. 상품 재고 차감
         productService.deductStocks(productIdToStockMap);
 
         // 2. 쿠폰 적용 및 할인 계산
         Money totalPrice = productService.calculateTotalPrice(productIdToStockMap);
-        Money discountPrice = couponService.apply(command.getCouponId(), command.getUserId(), totalPrice);
+        Money discountPrice = couponService.apply(command.couponId(), command.userId(), totalPrice);
 
         // 3. 주문 생성
-        Order order = orderService.create(command.getUserId(), productIdToStockMap, totalPrice, discountPrice);
+        Order order = orderService.create(command.userId(), productIdToStockMap, totalPrice, discountPrice);
 
-        return PlaceOrderResult.success(order.getOrderId());
+        return OrderResult.Create.success(order.getId());
     }
 
 
-    private Map<ProductId, Stock> getProductIdStockMap(Cart cart) {
-        return cart.getCartItems().stream()
+    private Map<Long, Stock> getProductIdStockMap(List<OrderCommand.CartItem> items) {
+        return items.stream()
                 .collect(Collectors.toMap(
-                        it -> ProductId.of(it.getProductId()),
-                        it -> Stock.of(it.getQuantity()))
+                        OrderCommand.CartItem::productId,
+                        it -> Stock.of(it.quantity()))
                 );
     }
 }

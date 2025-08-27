@@ -1,9 +1,7 @@
 package com.loopers.infrastructure.data.coupon;
 
 import com.loopers.domain.coupon.Coupon;
-import com.loopers.domain.coupon.CouponId;
 import com.loopers.domain.coupon.CouponRepository;
-import com.loopers.domain.user.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +14,8 @@ public class CouponRepositoryImpl implements CouponRepository {
     private final CouponJpaRepository couponJpaRepository;
 
     @Override
-    public Optional<Coupon> findByIdAndCouponId(CouponId couponId, UserId userId) {
-        return couponJpaRepository.findByIdAndUserId(couponId.getValue(), userId);
+    public Optional<Coupon> findByIdAndCouponId(Long couponId, Long userId) {
+        return couponJpaRepository.findByIdAndUserId(couponId, userId);
     }
 
     @Override
