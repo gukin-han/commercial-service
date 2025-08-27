@@ -1,11 +1,11 @@
 package com.loopers.application.like;
 
 import com.loopers.domain.like.ProductLikeEvent;
-import com.loopers.domain.like.ProductLikeEventPublisher;
 import com.loopers.domain.like.ProductLikeRepository;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +18,7 @@ public class ProductLikeFacade {
 
     private final UserService userService;
     private final ProductLikeRepository productLikeRepository;
-    private final ProductLikeEventPublisher productLikeEventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public ProductLikeResult.Like like(ProductLikeCommand.Like command) {
@@ -29,7 +29,7 @@ public class ProductLikeFacade {
 
         // 2. 상품 좋아요 수 증가
         if (isInserted) {
-            productLikeEventPublisher.publishAdded(new ProductLikeEvent.Added(command.productId(), UUID.randomUUID(), Instant.now()));
+            eventPublisher.publishEvent(new ProductLikeEvent.Added(command.productId(), UUID.randomUUID(), Instant.now()));
             return ProductLikeResult.Like.success();
         }
 
@@ -45,7 +45,7 @@ public class ProductLikeFacade {
         if (isDeleted) {
 
         // 2. 상품 좋아요 수 감소
-            productLikeEventPublisher.publishDeleted(new ProductLikeEvent.Deleted(command.productId(), UUID.randomUUID(), Instant.now()));
+            eventPublisher.publishEvent(new ProductLikeEvent.Deleted(command.productId(), UUID.randomUUID(), Instant.now()));
             return ProductLikeResult.Unlike.success();
         }
 
