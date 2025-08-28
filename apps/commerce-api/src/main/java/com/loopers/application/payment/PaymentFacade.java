@@ -12,9 +12,11 @@ import com.loopers.domain.payment.*;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -32,6 +34,7 @@ public class PaymentFacade {
     private final UserService userService;
     private final OrderService orderService;
     private final PaymentClient paymentClient;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     //    @Transactional
@@ -57,6 +60,7 @@ public class PaymentFacade {
                 .build();
     }
 
+    @Transactional
     public void syncPaymentCallbacks(Duration window) {
         ZonedDateTime cutoff = ZonedDateTime.now().minus(window);
 
@@ -81,6 +85,7 @@ public class PaymentFacade {
         });
     }
 
+    @Transactional
     public void syncPaymentCallback(SyncPaymentCommand command) {
         // 결제 상태 동기화 로직
         // 1. 주문 ID로 결제 정보 조회
@@ -91,5 +96,12 @@ public class PaymentFacade {
         payment.syncStatus(command.getStatus(), command.getReason());
 
         // 3. 성공/실패에 따라 주문 상태 업데이트 (생략)
+        if ("SUCCESS".equals(command.getStatus())) {
+            eventPublisher.publishEvent(new PaymentEvent.Completed(payment.getOrderId(), payment.getUserId()));
+        }
+
+        if ("FAILED".equals(command.getStatus())) {
+            eventPublisher.publishEvent(new PaymentEvent.Failed(payment.getOrderId(), payment.getUserId()));
+        }
     }
 }
