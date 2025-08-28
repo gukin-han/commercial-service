@@ -19,7 +19,7 @@ public class CouponService {
             return Money.ZERO;
         }
 
-        Coupon coupon = couponRepository.findByIdAndCouponId(couponId, userId)
+        Coupon coupon = couponRepository.findByIdAndUserId(couponId, userId)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "쿠폰을 찾을 수 없습니다."));
 
         if (coupon.isUsed()) {
@@ -29,5 +29,11 @@ public class CouponService {
         coupon.use();
         CouponDiscountCalculator calculator = new CouponDiscountCalculator();
         return calculator.calculateDiscountAmount(coupon, totalPrice);
+    }
+
+    public void restoreCoupon(Long orderId) {
+        Coupon coupon = couponRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "쿠폰을 찾을 수 없습니다."));
+        coupon.restore();
     }
 }

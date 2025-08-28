@@ -70,6 +70,10 @@ public class Product extends BaseEntity {
         this.stock = decreasedStock;
     }
 
+    public void increaseStock(long quantity) {
+        this.stock = stock.increase(quantity);
+    }
+
     private void canDecrease() {
         if (this.status == ProductStatus.SOLD_OUT) {
             throw new CoreException(ErrorType.CONFLICT, "재고 수량이 없습니다.");

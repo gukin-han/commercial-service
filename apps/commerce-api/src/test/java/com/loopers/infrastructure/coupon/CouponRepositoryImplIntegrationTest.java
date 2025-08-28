@@ -46,7 +46,7 @@ class CouponRepositoryImplIntegrationTest {
             Coupon savedCoupon = couponRepository.save(coupon);
 
             //when
-            Optional<Coupon> optionalCoupon = couponRepository.findByIdAndCouponId(savedCoupon.getId(), savedCoupon.getUserId());
+            Optional<Coupon> optionalCoupon = couponRepository.findByIdAndUserId(savedCoupon.getId(), savedCoupon.getUserId());
 
             //then
             assertThat(optionalCoupon.isPresent()).isTrue();

@@ -7,7 +7,6 @@ import com.loopers.application.payment.strategy.PaymentStrategyRouter;
 import com.loopers.common.error.CoreException;
 import com.loopers.common.error.ErrorType;
 import com.loopers.domain.order.Order;
-import com.loopers.domain.order.OrderRepository;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.*;
 import com.loopers.domain.user.User;
@@ -16,10 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -30,6 +27,7 @@ public class PaymentFacade {
     // TODO : 어디에 둘지 고민해보기
     public static final String BASE_CALLBACK_URL = "http://localhost:8080/api/v1/payments/%s/callback";
     private final PaymentRepository paymentRepository;
+    private final PaymentService paymentService;
     private final PaymentStrategyRouter router;
     private final UserService userService;
     private final OrderService orderService;
@@ -38,10 +36,16 @@ public class PaymentFacade {
 
     //    @Transactional
     public PayResult initiatePayment(String loginId, InitiateCommand command) {
+        paymentService.checkDuplicatePayment(command.orderId());
+        PayCommand payCommand = this.createPayCommand(loginId, command);
+        PaymentStrategy paymentStrategy = router.requestPayment(payCommand.getMethod());
+        return paymentStrategy.requestPayment(payCommand);
+    }
+
+    private PayCommand createPayCommand(String loginId, InitiateCommand command) {
         User user = userService.getByLoginId(loginId);
         Order order = orderService.get(command.orderId());
-
-        PayCommand payCommand = PayCommand.builder()
+        return PayCommand.builder()
                 .orderId(order.getId())
                 .userId(user.getId())
                 .loginId(user.getLoginId())
@@ -51,9 +55,6 @@ public class PaymentFacade {
                 .cardType(command.cardType())
                 .cardNo(command.cardNo())
                 .build();
-
-        PaymentStrategy paymentStrategy = router.requestPayment(command.method());
-        return paymentStrategy.requestPayment(payCommand);
     }
 
     public void syncPaymentCallbacks(Duration window) {

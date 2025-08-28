@@ -30,6 +30,9 @@ public class Order extends BaseEntity {
     @Column(nullable = false)
     private OrderStatus status;
 
+    @Version
+    private Long version;
+
 
     @Builder
     private Order(Long userId, Money totalPrice, Money discountAmount, OrderStatus status, Long couponId) {
@@ -46,5 +49,13 @@ public class Order extends BaseEntity {
                 .totalPrice(totalPrice)
                 .status(status)
                 .build();
+    }
+
+    public void completePayment() {
+        this.status = OrderStatus.PAID;
+    }
+
+    public void failPayment() {
+        this.status = OrderStatus.CANCELED;
     }
 }

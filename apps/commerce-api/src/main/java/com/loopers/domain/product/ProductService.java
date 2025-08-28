@@ -49,6 +49,24 @@ public class ProductService {
         }
     }
 
+    @Transactional
+    public void restoreStocks(Map<Long, Stock> productIdToStockMap) {
+        List<Long> productIds = productIdToStockMap.keySet().stream()
+                .toList();
+
+        List<Product> products = productRepository.findAllByIdsWithPessimisticLock(productIds);
+
+        if (products.size() != productIds.size()) {
+            throw new IllegalArgumentException("조회결과, 존재하지 않는 상품이 있습니다.");
+        }
+
+        for (Product product : products) {
+            Long productId = product.getId();
+            Stock stock = productIdToStockMap.get(productId);
+            product.increaseStock(stock.getQuantity());
+        }
+    }
+
     @Transactional(readOnly = true)
     public Money calculateTotalPrice(Map<Long, Stock> productIdToStockMap) {
         List<Long> productIds = productIdToStockMap.keySet().stream()
