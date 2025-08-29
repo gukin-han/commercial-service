@@ -97,6 +97,24 @@ public class ProductRepositoryImpl implements ProductRepository {
         return productJpaRepository.findAllById(productIds);
     }
 
+    @Override
+    public void updateLikeCount(Long productId, long count) {
+        jpaQueryFactory
+                .update(product)
+                .set(product.likeCount, product.likeCount.add(count)) // ← delta 더하기
+                .where(product.id.eq(productId))
+                .execute();
+    }
+
+    @Override
+    public Long getLikeCount(Long productId) {
+        return jpaQueryFactory
+                .select(product.likeCount)
+                .from(product)
+                .where(product.id.eq(productId))
+                .fetchOne();
+    }
+
     private OrderSpecifier<?>[] productSort(ProductSortType s) {
         return switch (s) {
             case LATEST ->

@@ -23,4 +23,8 @@ public interface ProductRepository {
     boolean decrementLikeCount(Long productId);
 
     List<Product> findAllById(List<Long> productIds);
+
+    void updateLikeCount(Long productId, long count);
+
+    Long getLikeCount(Long productId);
 }

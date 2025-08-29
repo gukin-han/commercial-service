@@ -79,7 +79,6 @@ public class ProductFacade {
         );
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void increaseLikeCount(Long productId) {
         productRepository.incrementLikeCount(productId);
     }
